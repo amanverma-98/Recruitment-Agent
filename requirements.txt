@@ -13,3 +13,4 @@ groq
 python-multipart
 python-docx
 reportlab
+langgraph-checkpoint-postgres
