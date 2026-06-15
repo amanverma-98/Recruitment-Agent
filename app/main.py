@@ -1,6 +1,11 @@
 from fastapi import FastAPI
 
 from app.api.routes.questions import router as question_router
+from app.models.question import Question
+from app.models.generation_log import GenerationLog
+from app.core.database import Base, engine
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="RecruitAI Agent"
