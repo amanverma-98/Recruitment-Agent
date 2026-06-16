@@ -15,14 +15,38 @@ class QuestionState(TypedDict):
 
 from app.services.groq_service import generate_mcq
 def generate_node(state):
-    question = generate_mcq(state["topic"],state["difficulty"])
+    try:
+        question = generate_mcq(
+            state["topic"],
+            state["difficulty"]
+        )
+    except Exception as e:
+        raise ValueError(
+            f"MCQ generation failed: {str(e)}"
+        )
     return {"question": question}
 
 from app.agents.evaluator import evaluate_question
+
+
 def evaluate_node(state):
     evaluation = evaluate_question(state["question"])
+
+    score = evaluation["score"]
+
+    question_text = state["question"]["question"]
+    options = state["question"]["options"]
+
+    if len(question_text) > 150:
+        score -= 10
+
+    if max(len(option) for option in options) > 120:
+        score -= 10
+
+    score = max(0, min(score, 100))
+
     return {
-        "score": evaluation["score"],
+        "score": score,
         "strengths": evaluation["strengths"],
         "improvements": evaluation["improvements"]
     }

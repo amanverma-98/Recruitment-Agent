@@ -4,6 +4,26 @@ from app.core.config import settings
 
 client = Groq(api_key=settings.GROQ_API_KEY)
 
+from pydantic import BaseModel, field_validator
+from typing import List
+
+
+class MCQSchema(BaseModel):
+    question: str
+    options: List[str]
+    correct_option: int
+    explanation: str
+
+    @field_validator("correct_option")
+    @classmethod
+    def validate_correct_option(cls, value):
+        if value < 0 or value > 3:
+            raise ValueError(
+                "correct_option must be between 0 and 3"
+            )
+        return value
+
+
 def generate_mcq(topic: str, difficulty: str):
 
     prompt = f"""
@@ -121,13 +141,7 @@ def generate_mcq(topic: str, difficulty: str):
     print(content)
     print("=" * 50)
 
-    for attempt in range(3):
-        try:
-            return json.loads(content)
+    data = json.loads(content)
+    validated = MCQSchema.model_validate(data)
 
-        except Exception:
-            continue
-
-    raise ValueError(
-        "Failed to generate valid JSON"
-    )
+    return validated.model_dump()

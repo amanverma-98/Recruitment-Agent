@@ -14,4 +14,4 @@ checkpointer = _checkpointer_cm.__enter__()
 checkpointer.setup()
 
 def get_graph():
-    return builder.compile(checkpointer=checkpointer)
+    return builder.compile()

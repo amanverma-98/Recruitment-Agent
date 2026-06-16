@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.schemas.question import (GenerateQuestionRequest, BulkGenerateRequest)
+from app.schemas.question import (GenerateQuestionRequest, BulkGenerateRequest, QuestionResponse)
 from app.services.question_service import (create_question)
 from app.workflows.langgraph_workflow import (run_question_workflow)
 from app.services.log_service import (create_log)
@@ -11,13 +11,25 @@ from app.services.log_service import (create_log)
 router = APIRouter()
 
 
-@router.post("/generate")
+@router.post("/generate", response_model=QuestionResponse)
 def generate_question(request: GenerateQuestionRequest, db: Session = Depends(get_db)):
     question = None
     for _ in range(3):
         try:
             generated = run_question_workflow(topic=request.topic, difficulty=request.difficulty)
-            question = create_question(db=db, payload=generated)
+            payload = {
+                "topic": generated["topic"],
+                "difficulty": generated["difficulty"],
+                "question": generated["question"],
+                "options": generated["options"],
+                "correct_option": generated["correct_option"],
+                "explanation": generated["explanation"],
+                "ai_score": generated["ai_score"],
+                "strengths": generated["strengths"],
+                "evaluation_feedback": generated["evaluation_feedback"],
+                "refinement_iterations": generated["refinement_iterations"]
+            }
+            question = create_question(db=db, payload=payload)
             break
 
         except ValueError as e:
@@ -43,17 +55,20 @@ def generate_question(request: GenerateQuestionRequest, db: Session = Depends(ge
 
     return {
     "id": question.id,
-    "question": question.question_text,
+    "topic": question.topic,
+    "difficulty": question.difficulty,
+    "question_type": question.question_type,
+    "question_text": question.question_text,
     "options": question.options,
     "correct_option": question.correct_option,
     "explanation": question.explanation,
     "ai_score": question.ai_score,
     "status": question.status
-    }
+}
 
 
 
-@router.post("/bulk-generate")
+@router.post("/bulk-generate", response_model=QuestionResponse)
 def bulk_generate(request: BulkGenerateRequest,db: Session = Depends(get_db)):
     generated_questions = []
     failed_questions = 0
