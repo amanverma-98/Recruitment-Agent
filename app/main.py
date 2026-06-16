@@ -4,11 +4,20 @@ from app.api.routes.questions import router as question_router
 from app.models.question import Question
 from app.models.generation_log import GenerationLog
 from app.core.database import Base, engine
+from fastapi.middleware.cors import CORSMiddleware
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="RecruitAI Agent"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(
