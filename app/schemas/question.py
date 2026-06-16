@@ -65,3 +65,6 @@ class CreateQuestionPayload(BaseModel):
     evaluation_feedback: List[str]
 
     refinement_iterations: int = Field(ge=0) 
+
+    status: str = "pending_review"
+    workflow_id: Optional[str] = None

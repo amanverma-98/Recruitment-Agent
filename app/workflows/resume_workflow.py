@@ -1,12 +1,14 @@
-from app.graph.graph import get_graph
 from langgraph.types import Command
+from app.graph.graph import get_graph
+
 
 def resume_workflow(workflow_id, feedback):
-
     graph = get_graph()
+
     result = graph.invoke(
         Command(
             resume={
+                "approved": False,
                 "feedback": feedback
             }
         ),
@@ -16,7 +18,5 @@ def resume_workflow(workflow_id, feedback):
             }
         }
     )
-    print("RESUME RESULT")
-    print(result)
 
     return result

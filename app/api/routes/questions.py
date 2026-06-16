@@ -27,7 +27,8 @@ def generate_question(request: GenerateQuestionRequest, db: Session = Depends(ge
                 "ai_score": generated["ai_score"],
                 "strengths": generated["strengths"],
                 "evaluation_feedback": generated["evaluation_feedback"],
-                "refinement_iterations": generated["refinement_iterations"]
+                "refinement_iterations": generated["refinement_iterations"],
+                "workflow_id": generated["workflow_id"]
             }
             question = create_question(db=db, payload=payload)
             break
@@ -63,7 +64,9 @@ def generate_question(request: GenerateQuestionRequest, db: Session = Depends(ge
     "correct_option": question.correct_option,
     "explanation": question.explanation,
     "ai_score": question.ai_score,
-    "status": question.status
+    "status": question.status,
+    "refinement_iterations": question.refinement_iterations,
+    "workflow_id": question.workflow_id
 }
 
 

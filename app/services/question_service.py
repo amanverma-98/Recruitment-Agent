@@ -53,10 +53,11 @@ def create_question(db, payload):
         strengths=payload.strengths,
         evaluation_feedback=payload.evaluation_feedback,
         refinement_iterations=payload.refinement_iterations,
-        status="pending_review"
+        status="pending_review",
+        workflow_id=payload.workflow_id
     )
 
-    if payload.ai_score < 60:
+    if payload.ai_score < 50:
         raise ValueError(
             f"Question quality too low ({payload.ai_score})"
         )

@@ -38,10 +38,10 @@ def evaluate_node(state):
     options = state["question"]["options"]
 
     if len(question_text) > 150:
-        score -= 10
+        score -= 5
 
     if max(len(option) for option in options) > 120:
-        score -= 10
+        score -= 5
 
     score = max(0, min(score, 100))
 
