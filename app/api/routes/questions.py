@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.schemas.question import (GenerateQuestionRequest, BulkGenerateRequest, QuestionResponse)
+from app.schemas.question import (GenerateQuestionRequest, BulkGenerateRequest, QuestionResponse, BulkGenerateResponse)
 from app.services.question_service import (create_question)
 from app.workflows.langgraph_workflow import (run_question_workflow)
 from app.services.log_service import (create_log)
@@ -71,7 +71,7 @@ def generate_question(request: GenerateQuestionRequest, db: Session = Depends(ge
 
 
 
-@router.post("/bulk-generate", response_model=QuestionResponse)
+@router.post("/bulk-generate", response_model=BulkGenerateResponse)
 def bulk_generate(request: BulkGenerateRequest,db: Session = Depends(get_db)):
     generated_questions = []
     failed_questions = 0

@@ -40,6 +40,11 @@ class BulkGenerateRequest(BaseModel):
     difficulty: str
     count: int
 
+class BulkGenerateResponse(BaseModel):
+    generated: int
+    failed: int
+    question_ids: list[str]    
+
 
 class ReviewRequest(BaseModel):
     action: Literal["approve","reject","improve"]
