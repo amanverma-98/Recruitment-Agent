@@ -1,39 +1,30 @@
-'use client';
-
-import React, { useState } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { AuthProvider } from '@/lib/auth/AuthContext';
-import ToastContainer from '@/components/ui/toast-container';
+import type { Metadata } from 'next';
+import Providers from './providers'; // Same folder se import
 import '@/app/globals.css';
+
+// Official Next.js Server Metadata (Best for SSR/SEO)
+export const metadata: Metadata = {
+  title: {
+    default: "RecruitAI - Agent Platform",
+    template: "%s | RecruitAI"
+  },
+  description: "Review and take action on AI-generated questions.",
+  icons: {
+    icon: "/white.png",
+    apple: "/white.png",
+  }
+};
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 1000 * 60 * 5, // 5 minutes cache
-            refetchOnWindowFocus: false,
-          },
-        },
-      })
-  );
-
   return (
     <html lang="en">
       <body>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            {children}
-            <ToastContainer />
-          </AuthProvider>
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
+        {/* Saare client components providers ke andar safely wrap ho gaye */}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
