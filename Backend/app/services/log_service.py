@@ -1,11 +1,10 @@
-from Backend.app.models.generation_log import (
+from app.models.generation_log import (
     GenerationLog
 )
 
 
 def create_log(
     db,
-    user_id,
     topic,
     difficulty,
     question_id,
@@ -15,7 +14,6 @@ def create_log(
 
     log = GenerationLog(
         topic=topic,
-        user_id=user_id,
         difficulty=difficulty,
         question_id=question_id,
         score=score,
@@ -24,6 +22,5 @@ def create_log(
 
     db.add(log)
     db.commit()
-    db.refresh(log)
 
     return log

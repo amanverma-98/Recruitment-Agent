@@ -5,7 +5,6 @@ from app.models.question import Question
 from app.models.generation_log import GenerationLog
 from app.core.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routes.auth import router as auth_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -19,12 +18,6 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
-)
-
-app.include_router(
-    auth_router,
-    prefix="/auth",
-    tags=["Authentication"]
 )
 
 app.include_router(

@@ -73,7 +73,3 @@ class CreateQuestionPayload(BaseModel):
 
     status: str = "pending_review"
     workflow_id: Optional[str] = None
-
-
-class DeleteQuestionsRequest(BaseModel):
-    question_ids: list[str]    

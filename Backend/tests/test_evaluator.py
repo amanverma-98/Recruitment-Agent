@@ -1,4 +1,4 @@
-from Backend.app.agents.evaluator import evaluate_question
+from app.agents.evaluator import evaluate_question
 
 
 question = {

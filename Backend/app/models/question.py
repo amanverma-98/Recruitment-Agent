@@ -9,21 +9,11 @@ from sqlalchemy import JSON
 
 from sqlalchemy.sql import func
 from sqlalchemy import Index
-from Backend.app.core.database import Base
-from sqlalchemy.orm import relationship
-from sqlalchemy import ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
+from app.core.database import Base
 
 
 class Question(Base):
     __tablename__ = "questions"
-
-    user_id = Column(
-    UUID(as_uuid=True),
-    ForeignKey("users.id", ondelete="CASCADE"),
-    nullable=False,
-    index=True
-)
 
     id = Column(
         String,
@@ -49,16 +39,6 @@ class Question(Base):
     reviewed_at = Column(DateTime(timezone=True), nullable=True)
     workflow_id = Column(String,nullable=True)
 
-    user = relationship(
-        "User",
-        back_populates="questions"
-    )
-
-    logs = relationship(
-    "GenerationLog",
-    back_populates="question",
-    cascade="all, delete-orphan"
-)
 
 Index(
     "idx_question_status",

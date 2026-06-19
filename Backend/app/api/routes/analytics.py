@@ -3,35 +3,21 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
-from Backend.app.core.database import get_db
-from Backend.app.models.question import Question
-
-from Backend.app.core.dependencies import get_current_user
-from Backend.app.models.user import User
+from app.core.database import get_db
+from app.models.question import Question
 
 router = APIRouter()
 
 
 @router.get("/")
-def analytics(db: Session = Depends(get_db),current_user: User = Depends(get_current_user)):
-    total = db.query(Question).filter(
-    Question.user_id == current_user.id
-).count()
-    approved = (db.query(Question).filter(Question.user_id == current_user.id, Question.status == "approved").count())
-    pending = (db.query(Question).filter(Question.user_id == current_user.id, Question.status.in_(["pending_review","needs_improvement"])).count())
-    rejected = (db.query(Question).filter(Question.user_id == current_user.id, Question.status == "rejected").count())
-    avg_score = (
-        db.query(func.avg(Question.ai_score))
-        .filter(Question.user_id == current_user.id)
-        .scalar()
-    )
-
-    avg_iterations = (
-        db.query(func.avg(Question.refinement_iterations))
-        .filter(Question.user_id == current_user.id)
-        .scalar()
-    )
-    needs_improvement = (db.query(Question).filter(Question.user_id == current_user.id,Question.status == "needs_improvement").count())
+def analytics(db: Session = Depends(get_db)):
+    total = db.query(Question).count()
+    approved = (db.query(Question).filter(Question.status == "approved").count())
+    pending = (db.query(Question).filter(Question.status.in_(["pending_review","needs_improvement"])).count())
+    rejected = (db.query(Question).filter(Question.status == "rejected").count())
+    avg_score = (db.query(func.avg(Question.ai_score)).scalar())
+    avg_iterations = (db.query(func.avg(Question.refinement_iterations)).scalar())
+    needs_improvement = (db.query(Question).filter(Question.status == "needs_improvement").count())
 
     return {
         "total_questions": total,
@@ -44,17 +30,8 @@ def analytics(db: Session = Depends(get_db),current_user: User = Depends(get_cur
     }
 
 
-from Backend.app.models.generation_log import GenerationLog
+from app.models.generation_log import GenerationLog
 
 @router.get("/logs")
-def get_logs(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    return (
-        db.query(GenerationLog)
-        .filter(
-            GenerationLog.user_id == current_user.id
-        )
-        .all()
-    )
+def get_logs(db: Session = Depends(get_db)):
+    return db.query(GenerationLog).all()
