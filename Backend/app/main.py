@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-
+from app.models.user import User
 from app.api.routes.questions import router as question_router
 from app.models.question import Question
 from app.models.generation_log import GenerationLog
