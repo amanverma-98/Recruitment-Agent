@@ -1,17 +1,6 @@
-import { apiClient } from '@/lib/axios';
-import type { DashboardAnalytics, ActivityLog } from '@/types/api';
+import { getDashboardAnalytics, getActivityLogs } from '@/lib/api/analyticsApi';
 
-// GET /analytics/ endpoint
-export const getDashboardAnalytics = async (): Promise<DashboardAnalytics> => {
-  const { data } = await apiClient.get('/analytics/');
-  return data;
-};
-
-// GET /analytics/logs endpoint
-export const getActivityLogs = async (): Promise<ActivityLog[]> => {
-  const { data } = await apiClient.get('/analytics/logs');
-  return data;
-};
-
-// Re-export types for convenience
-export type { DashboardAnalytics, ActivityLog };
+// Re-export from centralized API layer
+export { getDashboardAnalytics, getActivityLogs };
+export type { GenerationLogEntry } from '@/lib/api/analyticsApi';
+export type { DashboardAnalytics } from '@/types/api';

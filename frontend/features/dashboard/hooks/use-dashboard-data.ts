@@ -5,7 +5,7 @@ export const useDashboardAnalytics = () => {
   return useQuery({
     queryKey: ['dashboard', 'analytics'],
     queryFn: getDashboardAnalytics,
-    refetchInterval: 1000 * 30, // Har 30 seconds mein background auto-refresh
+    refetchInterval: 1000 * 30, // Background auto-refresh every 30s
   });
 };
 

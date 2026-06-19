@@ -1,35 +1,30 @@
-'use client';
+import type { Metadata } from 'next';
+import Providers from './providers'; // Same folder se import
+import '@/app/globals.css';
 
-import React, { useState } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import '@/app/globals.css'; // Aapki global CSS styles
+// Official Next.js Server Metadata (Best for SSR/SEO)
+export const metadata: Metadata = {
+  title: {
+    default: "RecruitAI - Agent Platform",
+    template: "%s | RecruitAI"
+  },
+  description: "Review and take action on AI-generated questions.",
+  icons: {
+    icon: "/white.png",
+    apple: "/white.png",
+  }
+};
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Har request par naya client instance create hone se rokne ke liye useState use kiya hai
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 1000 * 60 * 5, // 5 minutes cache default data
-            refetchOnWindowFocus: false,
-          },
-        },
-      })
-  );
-
   return (
     <html lang="en">
       <body>
-        <QueryClientProvider client={queryClient}>
-          {children}
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
+        {/* Saare client components providers ke andar safely wrap ho gaye */}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

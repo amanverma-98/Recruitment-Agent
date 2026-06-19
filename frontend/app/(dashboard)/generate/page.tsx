@@ -6,7 +6,7 @@ import { Brain, ShieldCheck, Sparkles, Cpu } from 'lucide-react';
 
 export default function GeneratePage() {
   return (
-    <div className="max-w-6xl mx-auto space-y-8 px-4  ">
+    <div className="max-w-6xl pt-7  px-4  ">
       
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-6">

@@ -14,7 +14,7 @@ export interface QuestionResponse {
   correct_option: number;       // index into `options[]`
   explanation?: string | null;
   ai_score?: number;
-  status: string;               // "pending" | "approved" | "rejected" etc.
+  status: string;               // "pending_review" | "approved" | "rejected" etc.
 }
 
 /** `POST /questions/generate` request body */
@@ -60,20 +60,32 @@ export interface ExportDocxRequest {
   question_ids: string[];
 }
 
+/** `DELETE /questions/` request body */
+export interface DeleteQuestionsRequest {
+  question_ids: string[];
+}
+
 /** `GET /analytics/` response */
 export interface DashboardAnalytics {
   total_questions: number;
   approved: number;
   pending: number;
   rejected: number;
+  needs_improvement?: number;
+  avg_ai_score?: number;
+  avg_iterations?: number;
 }
 
-/** `GET /analytics/logs` response item */
+/** `GET /analytics/logs` — actual GenerationLog model from backend */
 export interface ActivityLog {
   id: string;
-  message: string;
-  timestamp: string;
-  type: string;
+  user_id: string;
+  topic: string;
+  difficulty: string;
+  question_id: string;
+  score: number;
+  iterations: number;
+  created_at: string;
 }
 
 /** Validation error returned by FastAPI (422) */

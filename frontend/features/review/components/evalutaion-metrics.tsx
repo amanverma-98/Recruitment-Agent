@@ -1,13 +1,14 @@
 'use client';
 
 import React from 'react';
+import { CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 
 interface MetricsProps {
   score: number;
 }
 
 export default function EvaluationMetrics({ score }: MetricsProps) {
-  // Determine the color based on the score
+  // Determine the color and metadata based on the score
   const getScoreColor = (s: number) => {
     if (s >= 80) return { ring: 'border-emerald-500', bg: 'bg-emerald-50/20', bar: 'bg-emerald-500', text: 'text-emerald-600' };
     if (s >= 60) return { ring: 'border-amber-500', bg: 'bg-amber-50/20', bar: 'bg-amber-500', text: 'text-amber-600' };
@@ -40,15 +41,24 @@ export default function EvaluationMetrics({ score }: MetricsProps) {
           </div>
         </div>
 
-        {/* Score interpretation */}
-        <div className="pt-2 border-t border-gray-50">
-          <p className="text-[11px] text-gray-500 font-medium leading-relaxed">
-            {score >= 80 
-              ? '✅ This question meets high quality standards and is recommended for approval.'
-              : score >= 60 
-                ? '⚠️ This question is acceptable but may benefit from refinement.'
-                : '❌ This question needs significant improvement before approval.'}
-          </p>
+        {/* Score interpretation with Lucide Icons */}
+        <div className="pt-3 border-t border-gray-50">
+          {score >= 80 ? (
+            <div className="flex items-start gap-2 text-[11px] text-gray-500 font-medium leading-relaxed">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+              <span>This question meets high quality standards and is recommended for approval.</span>
+            </div>
+          ) : score >= 60 ? (
+            <div className="flex items-start gap-2 text-[11px] text-gray-500 font-medium leading-relaxed">
+              <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+              <span>This question is acceptable but may benefit from refinement.</span>
+            </div>
+          ) : (
+            <div className="flex items-start gap-2 text-[11px] text-gray-500 font-medium leading-relaxed">
+              <XCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+              <span>This question needs significant improvement before approval.</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
