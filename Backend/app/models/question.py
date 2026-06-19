@@ -9,7 +9,7 @@ from sqlalchemy import JSON
 
 from sqlalchemy.sql import func
 from sqlalchemy import Index
-from Backend.app.core.database import Base
+from app.core.database import Base
 from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql import UUID

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from Backend.app.models.user import User
-from Backend.app.core.security import (
+from app.models.user import User
+from app.core.security import (
     hash_password,
     verify_password,
     create_access_token

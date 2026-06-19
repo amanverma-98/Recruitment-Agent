@@ -1,4 +1,4 @@
-from Backend.app.models.generation_log import (
+from app.models.generation_log import (
     GenerationLog
 )
 

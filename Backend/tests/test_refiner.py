@@ -1,4 +1,4 @@
-from Backend.app.agents.refiner import refine_question
+from app.agents.refiner import refine_question
 
 question = {
     "question": "What is SQL?",

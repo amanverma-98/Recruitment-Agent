@@ -8,7 +8,7 @@ from sqlalchemy.sql import func
 from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from Backend.app.core.database import Base
+from app.core.database import Base
 
 
 class GenerationLog(Base):
