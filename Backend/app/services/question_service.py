@@ -1,9 +1,14 @@
+from sqlalchemy.orm import Session
+
 from app.models.question import Question
 from app.schemas.question import CreateQuestionPayload
 
 
-def create_question(db, payload, user_id):
-
+def create_question(
+    db: Session,
+    payload,
+    user_id
+):
     payload = CreateQuestionPayload.model_validate(payload)
 
     existing = (
@@ -21,25 +26,30 @@ def create_question(db, payload, user_id):
     if len(set(payload.options)) != 4:
         raise ValueError("Duplicate options found")
 
+    if len(payload.options) != 4:
+        raise ValueError("Invalid generated question")
+
     question_text = payload.question.lower()
 
     banned_phrases = [
-    "write a sql query",
-    "write sql query",
-    "write a query",
-    "create a sql query",
-    "create a query",
-    "construct a query",
-    "which query",
-    "sql query will return"
-]
+        "write a sql query",
+        "write sql query",
+        "write a query",
+        "create a sql query",
+        "create a query",
+        "construct a query",
+        "which query",
+        "sql query will return"
+    ]
 
     for phrase in banned_phrases:
         if phrase in question_text:
             raise ValueError("Invalid generated question")
 
-    if len(payload.options) != 4:
-        raise ValueError("Invalid generated question")
+    if payload.ai_score < 50:
+        raise ValueError(
+            f"Question quality too low ({payload.ai_score})"
+        )
 
     question = Question(
         topic=payload.topic,
@@ -58,13 +68,8 @@ def create_question(db, payload, user_id):
         workflow_id=payload.workflow_id
     )
 
-    if payload.ai_score < 50:
-        raise ValueError(
-            f"Question quality too low ({payload.ai_score})"
-        )
-
     db.add(question)
-    db.commit()
+    db.flush()
     db.refresh(question)
 
     return question

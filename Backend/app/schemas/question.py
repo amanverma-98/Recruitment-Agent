@@ -36,9 +36,12 @@ class UpdateStatusRequest(BaseModel):
 
 
 class BulkGenerateRequest(BaseModel):
-    topic: str
-    difficulty: str
-    count: int
+
+    topics: list[str]
+
+    difficulties: list[str]
+
+    count: int 
 
 class BulkGenerateResponse(BaseModel):
     generated: int

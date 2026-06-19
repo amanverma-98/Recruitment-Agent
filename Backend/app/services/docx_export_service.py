@@ -2,7 +2,11 @@ from io import BytesIO
 from docx import Document
 
 
-def generate_docx(questions):
+def generate_docx(questions,
+
+    include_answers=False,
+
+    include_explanations=False):
 
     document = Document()
 
@@ -14,9 +18,10 @@ def generate_docx(questions):
         document.add_paragraph("Options:")
         for option in question.options:
             document.add_paragraph(option, style="List Bullet")
-
-        document.add_paragraph(f"Correct Answer: {question.correct_option}")
-        document.add_paragraph(question.explanation)
+        if include_answers:
+            document.add_paragraph(f"Correct Answer: {question.correct_option}")
+        if include_explanations:
+            document.add_paragraph(question.explanation)
         document.add_page_break()
 
     buffer = BytesIO()

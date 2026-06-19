@@ -15,128 +15,231 @@ router = APIRouter()
 
 
 @router.post("/generate", response_model=QuestionResponse)
-def generate_question(request: GenerateQuestionRequest, db: Session = Depends(get_db),current_user: User = Depends(get_current_user)):
+def generate_question(
+    request: GenerateQuestionRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     question = None
-    for _ in range(3):
-        try:
-            generated = run_question_workflow(topic=request.topic, difficulty=request.difficulty)
-            payload = {
-                "topic": generated["topic"],
-                "difficulty": generated["difficulty"],
-                "question": generated["question"],
-                "options": generated["options"],
-                "correct_option": generated["correct_option"],
-                "explanation": generated["explanation"],
-                "ai_score": generated["ai_score"],
-                "strengths": generated["strengths"],
-                "evaluation_feedback": generated["evaluation_feedback"],
-                "refinement_iterations": generated["refinement_iterations"],
-                "workflow_id": generated["workflow_id"]
-            }
-            question = create_question(db=db, payload=payload, user_id=current_user.id)
-            break
 
-        except ValueError as e:
-            if ("Duplicate question" in str(e) or "Invalid generated question" in str(e)):
-                continue
-            raise
+    try:
 
-    if question is None:
-        raise HTTPException(
-            status_code=500,
-            detail="Could not generate unique question"
+        for _ in range(3):
+
+            try:
+
+                generated = run_question_workflow(
+                    topic=request.topic,
+                    difficulty=request.difficulty
+                )
+
+                payload = {
+                    "topic": generated["topic"],
+                    "difficulty": generated["difficulty"],
+                    "question": generated["question"],
+                    "options": generated["options"],
+                    "correct_option": generated["correct_option"],
+                    "explanation": generated["explanation"],
+                    "ai_score": generated["ai_score"],
+                    "strengths": generated["strengths"],
+                    "evaluation_feedback": generated["evaluation_feedback"],
+                    "refinement_iterations": generated["refinement_iterations"],
+                    "workflow_id": generated["workflow_id"]
+                }
+
+                question = create_question(
+                    db=db,
+                    payload=payload,
+                    user_id=current_user.id
+                )
+
+                break
+
+            except ValueError as e:
+
+                if (
+                    "Duplicate question" in str(e)
+                    or
+                    "Invalid generated question" in str(e)
+                ):
+                    continue
+
+                raise
+
+        if question is None:
+            raise HTTPException(
+                status_code=500,
+                detail="Could not generate unique question"
+            )
+
+        create_log(
+            db=db,
+            user_id=current_user.id,
+            topic=question.topic,
+            difficulty=question.difficulty,
+            question_id=question.id,
+            score=question.ai_score,
+            iterations=question.refinement_iterations
         )
 
-    create_log(
-        db=db,
-        user_id=current_user.id,
-        topic=request.topic,
-        difficulty=request.difficulty,
-        question_id=question.id,
-        score=question.ai_score,
-        iterations=question.refinement_iterations
-    )
+        db.commit()
+        db.refresh(question)
 
+        return question
 
-    return {
-    "id": question.id,
-    "topic": question.topic,
-    "difficulty": question.difficulty,
-    "question_type": question.question_type,
-    "question_text": question.question_text,
-    "options": question.options,
-    "correct_option": question.correct_option,
-    "explanation": question.explanation,
-    "ai_score": question.ai_score,
-    "status": question.status,
-    "refinement_iterations": question.refinement_iterations,
-    "workflow_id": question.workflow_id
-}
+    except Exception:
+        db.rollback()
+        raise
 
+from concurrent.futures import ThreadPoolExecutor
+from itertools import product
+import random
+
+from app.core.database import SessionLocal
+
+def generate_single_question(
+    topic,
+    difficulty,
+    user_id
+):
+    db: Session = SessionLocal()
+
+    try:
+
+        question = None
+
+        for _ in range(3):
+
+            try:
+
+                generated = run_question_workflow(
+                    topic=topic,
+                    difficulty=difficulty
+                )
+
+                payload = {
+                    "topic": generated["topic"],
+                    "difficulty": generated["difficulty"],
+                    "question": generated["question"],
+                    "options": generated["options"],
+                    "correct_option": generated["correct_option"],
+                    "explanation": generated["explanation"],
+                    "ai_score": generated["ai_score"],
+                    "strengths": generated["strengths"],
+                    "evaluation_feedback": generated["evaluation_feedback"],
+                    "refinement_iterations": generated["refinement_iterations"],
+                    "workflow_id": generated["workflow_id"]
+                }
+
+                question = create_question(
+                    db=db,
+                    payload=payload,
+                    user_id=user_id
+                )
+
+                break
+
+            except ValueError as e:
+
+                if (
+                    "Duplicate question" in str(e)
+                    or
+                    "Invalid generated question" in str(e)
+                ):
+                    continue
+
+                raise
+
+        if question is None:
+            raise Exception("Generation failed")
+
+        create_log(
+            db=db,
+            user_id=user_id,
+            topic=question.topic,
+            difficulty=question.difficulty,
+            question_id=question.id,
+            score=question.ai_score,
+            iterations=question.refinement_iterations
+        )
+
+        db.commit()
+
+        return question.id
+
+    except Exception:
+
+        db.rollback()
+        raise
+
+    finally:
+
+        db.close()
 
 
 @router.post("/bulk-generate", response_model=BulkGenerateResponse)
-def bulk_generate(request: BulkGenerateRequest,db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def bulk_generate(
+    request: BulkGenerateRequest,
+    current_user: User = Depends(get_current_user)
+):
+
+    combinations = list(
+        product(
+            request.topics,
+            request.difficulties
+        )
+    )
+
+    random.shuffle(combinations)
+
+    tasks = []
+
+    for i in range(request.count):
+
+        tasks.append(
+            combinations[i % len(combinations)]
+        )
+
     generated_questions = []
-    failed_questions = 0
-    for _ in range(request.count):
-        try:
-            question = None
-            for _ in range(3):
-                try:
-                    generated = run_question_workflow(topic=request.topic, difficulty=request.difficulty)
-                    payload = {
-                        "topic": generated["topic"],
-                        "difficulty": generated["difficulty"],
-                        "question": generated["question"],
-                        "options": generated["options"],
-                        "correct_option": generated["correct_option"],
-                        "explanation": generated["explanation"],
-                        "ai_score": generated["ai_score"],
-                        "strengths": generated["strengths"],
-                        "evaluation_feedback": generated["evaluation_feedback"],
-                        "refinement_iterations": generated["refinement_iterations"],
-                        "workflow_id": generated["workflow_id"]
-                    }
-                    question = create_question(db=db, payload=payload, user_id=current_user.id)
-                    break
+    failed = 0
 
-                except ValueError as e:
-                    if ("Duplicate question" in str(e) or "Invalid generated question" in str(e)):
-                        continue
-                    raise
+    with ThreadPoolExecutor(max_workers=2) as executor:
 
-            if question is None:
-                raise HTTPException(
-                    status_code=500,
-                    detail="Could not generate unique question"
+        futures = [
+            executor.submit(
+                generate_single_question,
+                topic,
+                difficulty,
+                current_user.id
+            )
+            for topic, difficulty in tasks
+        ]
+
+        for future in futures:
+
+            try:
+
+                generated_questions.append(
+                    future.result()
                 )
 
-            generated_questions.append(question.id)
+            except Exception as e:
 
-            create_log(
-                db=db,
-                user_id=current_user.id,
-                topic=request.topic,
-                difficulty=request.difficulty,
-                question_id=question.id,
-                score=question.ai_score,
-                iterations=question.refinement_iterations
-            )
-        except Exception as e:
-            failed_questions += 1
-            print(e)
-    
+                print(e)
+
+                failed += 1
+
     if not generated_questions:
+
         raise HTTPException(
             status_code=500,
             detail="Failed to generate questions"
         )
-    
+
     return {
-    "generated": len(generated_questions),
-    "failed": failed_questions,
-    "question_ids": generated_questions
+        "generated": len(generated_questions),
+        "failed": failed,
+        "question_ids": generated_questions
     }
 
 
@@ -282,7 +385,7 @@ def export_pdf(request: ExportRequest, db: Session = Depends(get_db), current_us
             detail="No questions found"
         )
 
-    pdf = generate_questions_pdf(questions)
+    pdf = generate_questions_pdf(questions, include_answers=request.include_answers, include_explanations=request.include_explanations)
 
     return StreamingResponse(
         pdf,
@@ -313,7 +416,7 @@ def export_docx(request: ExportRequest, db: Session = Depends(get_db), current_u
             detail="No questions found"
         )
 
-    buffer = generate_docx(questions)
+    buffer = generate_docx(questions, include_answers=request.include_answers, include_explanations=request.include_explanations)
 
     return StreamingResponse(
         buffer,
@@ -332,6 +435,8 @@ def export_all_pdf(
     topic: str | None = None,
     difficulty: str | None = None,
     status: str = "approved",
+    include_answers: bool = True,
+    include_explanations: bool = False,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -356,7 +461,7 @@ def export_all_pdf(
             detail="No questions found"
         )
 
-    buffer = generate_questions_pdf(questions)
+    buffer = generate_questions_pdf(questions, include_answers=include_answers, include_explanations=include_explanations)
 
     return StreamingResponse(
         buffer,
@@ -373,6 +478,8 @@ def export_all_docx(
     topic: str | None = None,
     difficulty: str | None = None,
     status: str = "approved",
+    include_answers: bool = True,
+    include_explanations: bool = False,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -397,7 +504,7 @@ def export_all_docx(
             detail="No questions found"
         )
 
-    buffer = generate_docx(questions)
+    buffer = generate_docx(questions, include_answers=include_answers, include_explanations=include_explanations)
 
     return StreamingResponse(
         buffer,
