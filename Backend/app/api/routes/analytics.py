@@ -3,11 +3,11 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
-from Backend.app.core.database import get_db
-from Backend.app.models.question import Question
+from app.core.database import get_db
+from app.models.question import Question
 
-from Backend.app.core.dependencies import get_current_user
-from Backend.app.models.user import User
+from app.core.dependencies import get_current_user
+from app.models.user import User
 
 router = APIRouter()
 
@@ -44,7 +44,7 @@ def analytics(db: Session = Depends(get_db),current_user: User = Depends(get_cur
     }
 
 
-from Backend.app.models.generation_log import GenerationLog
+from app.models.generation_log import GenerationLog
 
 @router.get("/logs")
 def get_logs(

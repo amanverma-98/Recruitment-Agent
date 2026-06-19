@@ -2,14 +2,14 @@ from fastapi import HTTPException
 from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from Backend.app.core.database import get_db
-from Backend.app.schemas.question import (GenerateQuestionRequest, BulkGenerateRequest, QuestionResponse, BulkGenerateResponse)
-from Backend.app.services.question_service import (create_question)
-from Backend.app.workflows.langgraph_workflow import (run_question_workflow)
-from Backend.app.services.log_service import (create_log)
-from Backend.app.core.dependencies import get_current_user
-from Backend.app.models.user import User
-from Backend.app.models.generation_log import GenerationLog
+from app.core.database import get_db
+from app.schemas.question import (GenerateQuestionRequest, BulkGenerateRequest, QuestionResponse, BulkGenerateResponse)
+from app.services.question_service import (create_question)
+from app.workflows.langgraph_workflow import (run_question_workflow)
+from app.services.log_service import (create_log)
+from app.core.dependencies import get_current_user
+from app.models.user import User
+from app.models.generation_log import GenerationLog
 
 router = APIRouter()
 
@@ -140,7 +140,7 @@ def bulk_generate(request: BulkGenerateRequest,db: Session = Depends(get_db), cu
     }
 
 
-from Backend.app.models.question import Question
+from app.models.question import Question
 
 @router.get("/", response_model=list[QuestionResponse])
 def get_questions(status: str | None = None, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
@@ -169,7 +169,7 @@ def get_question(question_id: str, db: Session = Depends(get_db), current_user: 
 
 
 
-from Backend.app.schemas.question import (UpdateStatusRequest)
+from app.schemas.question import (UpdateStatusRequest)
 
 @router.patch("/{question_id}/status", response_model=QuestionResponse)
 def update_status(question_id: str, request: UpdateStatusRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
@@ -193,8 +193,8 @@ def update_status(question_id: str, request: UpdateStatusRequest, db: Session = 
     return question
 
 
-from Backend.app.schemas.question import ReviewRequest
-from Backend.app.workflows.resume_workflow import resume_workflow
+from app.schemas.question import ReviewRequest
+from app.workflows.resume_workflow import resume_workflow
 
 @router.patch("/{question_id}/review", response_model=QuestionResponse)
 def review_question(question_id: str,request: ReviewRequest,db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
@@ -263,8 +263,8 @@ def review_question(question_id: str,request: ReviewRequest,db: Session = Depend
 
 
 from fastapi.responses import StreamingResponse
-from Backend.app.schemas.export import ExportRequest
-from Backend.app.services.export_service import (generate_questions_pdf)
+from app.schemas.export import ExportRequest
+from app.services.export_service import (generate_questions_pdf)
 
 @router.post("/export/pdf")
 def export_pdf(request: ExportRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
@@ -294,7 +294,7 @@ def export_pdf(request: ExportRequest, db: Session = Depends(get_db), current_us
     )
 
 
-from Backend.app.services.docx_export_service import (generate_docx)
+from app.services.docx_export_service import (generate_docx)
 
 
 @router.post("/export/docx")
@@ -411,7 +411,7 @@ def export_all_docx(
     )
 
 
-from Backend.app.schemas.question import DeleteQuestionsRequest
+from app.schemas.question import DeleteQuestionsRequest
 
 @router.delete("/")
 def delete_questions(
