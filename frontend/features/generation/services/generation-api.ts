@@ -1,7 +1,6 @@
-import { apiClient } from '@/lib/axios';
+import { bulkGenerateQuestions as bulkGenerate } from '@/lib/api/questionsApi';
 import type { BulkGenerateResponse } from '@/types/api';
 
-// Hum mutation hook se arrays (`string[]`) accept karenge aur function ke andar string banayenge
 export interface BulkGenerateInput {
   topics: string[];
   difficulties: string[];
@@ -16,14 +15,10 @@ export const bulkGenerateQuestions = async ({
   difficulties, 
   count 
 }: BulkGenerateInput): Promise<BulkGenerateResponse> => {
-  
-  // Array ko comma-separated string mein convert kar rahe hain: "html , css"
-  const payload = {
+  // Array ko comma-separated string mein convert kar rahe hain
+  return bulkGenerate({
     topic: topics.join(', '),
     difficulty: difficulties.join(', '),
-    count: count
-  };
-
-  const { data } = await apiClient.post('/questions/bulk-generate', payload);
-  return data;
+    count: count,
+  });
 };

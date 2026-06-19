@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Calendar, Plus, ArrowRight, Loader2, Database, Layers, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Calendar, Plus, ArrowRight, Loader2, Database, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useDashboardAnalytics, useActivityLogs } from '@/features/dashboard/hooks/use-dashboard-data';
 import AnalyticsCard from '@/features/dashboard/components/analytics-card';
 import AgentStatusList from '@/features/dashboard/components/agent-status-list';
@@ -10,7 +10,7 @@ import AgentStatusList from '@/features/dashboard/components/agent-status-list';
 export default function DashboardPage() {
   const { data: metrics, isLoading, isError } = useDashboardAnalytics();
   const { data: logs, isLoading: logsLoading } = useActivityLogs();
-console.log("Backend Logs Data:", logs);
+
   // Format today's date range for display
   const now = new Date();
   const weekAgo = new Date(now);
@@ -65,7 +65,7 @@ console.log("Backend Logs Data:", logs);
       {/* Grid view 2: NEW Pipeline Status Monitor Table paired with side status */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {/* REPLACED: Recent Activity list turns into modern Generation Streams tracker */}
+        {/* Active Generation Monitors */}
         <div className="lg:col-span-8 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="p-6 border-b border-gray-50 flex items-center justify-between">
             <div>
@@ -93,24 +93,16 @@ console.log("Backend Logs Data:", logs);
                 </thead>
                 <tbody className="divide-y divide-gray-50 text-sm h-100">
   {logs
-    // 1. Array ko clone karke sorting chalayi taaki original state mutate na ho
     .slice() 
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    // 2. Sirf top 5 latest elements select kiye dashboard view ke liye
     .slice(0, 5)
     .map((log) => {
-      // Unique key from backend 'id'
       const uniqueKey = log.id;
-      
-      // Custom readable message based on topic and difficulty
       const logMessage = `Generated ${log.topic} Question (${log.difficulty})`;
-      
-      // Score threshold check for badge coloring
       const isHighScore = log.score >= 70;
 
       return (
         <tr key={uniqueKey} className="hover:bg-gray-50/40 transition-colors">
-          {/* Topic & Operation Meta */}
           <td className="py-4 px-6 font-medium text-gray-800">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg shrink-0 bg-purple-50 text-purple-600">
@@ -123,7 +115,6 @@ console.log("Backend Logs Data:", logs);
             </div>
           </td>
 
-          {/* Evaluation Quality Score Metrics Badge */}
           <td className="py-4 px-4">
             <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg border
               ${isHighScore 
@@ -136,7 +127,6 @@ console.log("Backend Logs Data:", logs);
             </span>
           </td>
 
-          {/* Dynamic Timestamp Parsing */}
           <td className="py-4 px-6 text-right text-xs text-gray-400 font-medium whitespace-nowrap">
             {formatTimestamp(log.created_at)}
           </td>

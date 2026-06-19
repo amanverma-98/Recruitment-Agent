@@ -1,15 +1,20 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Loader2, Eye } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Loader2, Eye, Trash2 } from 'lucide-react';
 import { useQuestionBank } from '@/features/bank/hooks/use-bank';
+import { useDeleteQuestions } from '@/features/bank/hooks/use-delete-questions';
 import BankControls from '@/features/bank/components/bank-controls';
 
 export default function QuestionBankPage() {
+  const router = useRouter();
   const [filters, setFilters] = useState({ search: '', topic: '' });
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   
   const { data: questions, isLoading, isError } = useQuestionBank(filters);
+  const { mutate: deleteQuestion, isPending: isDeleting } = useDeleteQuestions();
 
   const handleSelectRow = (id: string, checked: boolean) => {
     if (checked) {
@@ -25,6 +30,15 @@ export default function QuestionBankPage() {
     } else {
       setSelectedIds([]);
     }
+  };
+
+  const handleDelete = (id: string) => {
+    deleteQuestion([id], {
+      onSuccess: () => {
+        setDeleteConfirm(null);
+        setSelectedIds(prev => prev.filter(sid => sid !== id));
+      },
+    });
   };
 
   return (
@@ -98,9 +112,25 @@ export default function QuestionBankPage() {
                       </td>
                       <td className="p-4 font-bold text-gray-900">{q.ai_score ?? '—'}</td>
                       <td className="p-4 text-center">
-                        <button className="p-1.5 hover:bg-gray-100 text-gray-400 hover:text-purple-600 rounded-lg transition-colors">
-                          <Eye className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center justify-center gap-1">
+                          {/* Eye icon — navigate to question detail page */}
+                          <button
+                            onClick={() => router.push(`/questions/${q.id}`)}
+                            className="p-1.5 hover:bg-gray-100 text-gray-400 hover:text-purple-600 rounded-lg transition-colors"
+                            title="View details"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          
+                          {/* Delete icon */}
+                          <button
+                            onClick={() => setDeleteConfirm(q.id)}
+                            className="p-1.5 hover:bg-rose-50 text-gray-400 hover:text-rose-600 rounded-lg transition-colors"
+                            title="Delete question"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -116,6 +146,44 @@ export default function QuestionBankPage() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-6 shadow-2xl max-w-sm w-full mx-4 animate-in zoom-in-95 duration-200">
+            <div className="text-center">
+              <div className="w-12 h-12 mx-auto mb-4 bg-rose-50 rounded-full flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-rose-500" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Delete Question</h3>
+              <p className="text-sm text-gray-500 mt-2">
+                Are you sure you want to delete this question? This action cannot be undone.
+              </p>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                disabled={isDeleting}
+                className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl text-sm transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirm)}
+                disabled={isDeleting}
+                className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+              >
+                {isDeleting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  'Delete'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
