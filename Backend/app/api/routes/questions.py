@@ -2,17 +2,20 @@ from fastapi import HTTPException
 from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from app.core.database import get_db
-from app.schemas.question import (GenerateQuestionRequest, BulkGenerateRequest, QuestionResponse, BulkGenerateResponse)
-from app.services.question_service import (create_question)
-from app.workflows.langgraph_workflow import (run_question_workflow)
-from app.services.log_service import (create_log)
+from Backend.app.core.database import get_db
+from Backend.app.schemas.question import (GenerateQuestionRequest, BulkGenerateRequest, QuestionResponse, BulkGenerateResponse)
+from Backend.app.services.question_service import (create_question)
+from Backend.app.workflows.langgraph_workflow import (run_question_workflow)
+from Backend.app.services.log_service import (create_log)
+from Backend.app.core.dependencies import get_current_user
+from Backend.app.models.user import User
+from Backend.app.models.generation_log import GenerationLog
 
 router = APIRouter()
 
 
 @router.post("/generate", response_model=QuestionResponse)
-def generate_question(request: GenerateQuestionRequest, db: Session = Depends(get_db)):
+def generate_question(request: GenerateQuestionRequest, db: Session = Depends(get_db),current_user: User = Depends(get_current_user)):
     question = None
     for _ in range(3):
         try:
@@ -30,7 +33,7 @@ def generate_question(request: GenerateQuestionRequest, db: Session = Depends(ge
                 "refinement_iterations": generated["refinement_iterations"],
                 "workflow_id": generated["workflow_id"]
             }
-            question = create_question(db=db, payload=payload)
+            question = create_question(db=db, payload=payload, user_id=current_user.id)
             break
 
         except ValueError as e:
@@ -46,6 +49,7 @@ def generate_question(request: GenerateQuestionRequest, db: Session = Depends(ge
 
     create_log(
         db=db,
+        user_id=current_user.id,
         topic=request.topic,
         difficulty=request.difficulty,
         question_id=question.id,
@@ -72,7 +76,7 @@ def generate_question(request: GenerateQuestionRequest, db: Session = Depends(ge
 
 
 @router.post("/bulk-generate", response_model=BulkGenerateResponse)
-def bulk_generate(request: BulkGenerateRequest,db: Session = Depends(get_db)):
+def bulk_generate(request: BulkGenerateRequest,db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     generated_questions = []
     failed_questions = 0
     for _ in range(request.count):
@@ -81,7 +85,20 @@ def bulk_generate(request: BulkGenerateRequest,db: Session = Depends(get_db)):
             for _ in range(3):
                 try:
                     generated = run_question_workflow(topic=request.topic, difficulty=request.difficulty)
-                    question = create_question(db=db, payload=generated)
+                    payload = {
+                        "topic": generated["topic"],
+                        "difficulty": generated["difficulty"],
+                        "question": generated["question"],
+                        "options": generated["options"],
+                        "correct_option": generated["correct_option"],
+                        "explanation": generated["explanation"],
+                        "ai_score": generated["ai_score"],
+                        "strengths": generated["strengths"],
+                        "evaluation_feedback": generated["evaluation_feedback"],
+                        "refinement_iterations": generated["refinement_iterations"],
+                        "workflow_id": generated["workflow_id"]
+                    }
+                    question = create_question(db=db, payload=payload, user_id=current_user.id)
                     break
 
                 except ValueError as e:
@@ -99,6 +116,7 @@ def bulk_generate(request: BulkGenerateRequest,db: Session = Depends(get_db)):
 
             create_log(
                 db=db,
+                user_id=current_user.id,
                 topic=request.topic,
                 difficulty=request.difficulty,
                 question_id=question.id,
@@ -109,6 +127,12 @@ def bulk_generate(request: BulkGenerateRequest,db: Session = Depends(get_db)):
             failed_questions += 1
             print(e)
     
+    if not generated_questions:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to generate questions"
+        )
+    
     return {
     "generated": len(generated_questions),
     "failed": failed_questions,
@@ -116,19 +140,28 @@ def bulk_generate(request: BulkGenerateRequest,db: Session = Depends(get_db)):
     }
 
 
-from app.models.question import Question
+from Backend.app.models.question import Question
 
-@router.get("/")
-def get_questions(status: str | None = None, db: Session = Depends(get_db)):
-    query = db.query(Question)
+@router.get("/", response_model=list[QuestionResponse])
+def get_questions(status: str | None = None, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    query = db.query(Question).filter(
+    Question.user_id == current_user.id
+    )
     if status:
         query = query.filter(Question.status == status)
     return query.all()
 
 
-@router.get("/{question_id}")
-def get_question(question_id: str, db: Session = Depends(get_db)):
-    question = (db.query(Question).filter(Question.id == question_id).first())
+@router.get("/{question_id}", response_model=QuestionResponse)
+def get_question(question_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    question = (
+    db.query(Question)
+    .filter(
+        Question.id == question_id,
+        Question.user_id == current_user.id
+    )
+    .first()
+)
     if not question:
         raise HTTPException(status_code=404, detail="Question not found")
     return question
@@ -136,11 +169,18 @@ def get_question(question_id: str, db: Session = Depends(get_db)):
 
 
 
-from app.schemas.question import (UpdateStatusRequest)
+from Backend.app.schemas.question import (UpdateStatusRequest)
 
-@router.patch("/{question_id}/status")
-def update_status(question_id: str, request: UpdateStatusRequest, db: Session = Depends(get_db)):
-    question = (db.query(Question).filter(Question.id == question_id).first())
+@router.patch("/{question_id}/status", response_model=QuestionResponse)
+def update_status(question_id: str, request: UpdateStatusRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    question = (
+    db.query(Question)
+    .filter(
+        Question.id == question_id,
+        Question.user_id == current_user.id
+    )
+    .first()
+)
     if not question:
         raise HTTPException(
             status_code=404,
@@ -153,12 +193,19 @@ def update_status(question_id: str, request: UpdateStatusRequest, db: Session = 
     return question
 
 
-from app.schemas.question import ReviewRequest
-from app.workflows.resume_workflow import resume_workflow
+from Backend.app.schemas.question import ReviewRequest
+from Backend.app.workflows.resume_workflow import resume_workflow
 
-@router.patch("/{question_id}/review")
-def review_question(question_id: str,request: ReviewRequest,db: Session = Depends(get_db)):
-    question = (db.query(Question).filter(Question.id == question_id).first())
+@router.patch("/{question_id}/review", response_model=QuestionResponse)
+def review_question(question_id: str,request: ReviewRequest,db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    question = (
+    db.query(Question)
+    .filter(
+        Question.id == question_id,
+        Question.user_id == current_user.id
+    )
+    .first()
+)
 
     if not question:
         raise HTTPException(status_code=404,detail="Question not found")
@@ -169,7 +216,6 @@ def review_question(question_id: str,request: ReviewRequest,db: Session = Depend
         question.status = "rejected"
 
     elif request.action == "improve":
-        result = resume_workflow(question.workflow_id, request.feedback)
         if not request.feedback:
             raise HTTPException(
                 status_code=400,
@@ -181,40 +227,55 @@ def review_question(question_id: str,request: ReviewRequest,db: Session = Depend
                 status_code=400,
                 detail="Question has no workflow checkpoint"
             )
-        
-        question.topic = result["topic"]
-        question.difficulty = result["difficulty"]
-        question.question_text = (result["question"]["question"])
-        question.options = (result["question"]["options"])
-        question.correct_option = (result["question"]["correct_option"])
-        question.explanation = (result["question"]["explanation"])
-        question.ai_score = (result["score"])
-        question.refinement_iterations = (result["refinement_iterations"])
-        question.status = "pending_review"
-        question.strengths = result["strengths"]
-        question.evaluation_feedback = (result["improvements"])
-        question.review_feedback = (request.feedback)
+        try:
+            result = resume_workflow(
+                question.workflow_id,
+                request.feedback
+            )
 
-    else:
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid review action"
-        )    
+            question.topic = result["topic"]
+            question.difficulty = result["difficulty"]
+            question.question_text = result["question"]["question"]
+            question.options = result["question"]["options"]
+            question.correct_option = result["question"]["correct_option"]
+            question.explanation = result["question"]["explanation"]
+            question.ai_score = result["score"]
+            question.refinement_iterations = result["refinement_iterations"]
+            question.status = "pending_review"
+            question.strengths = result["strengths"]
+            question.evaluation_feedback = result["improvements"]
+            question.review_feedback = request.feedback
 
-    from datetime import datetime, timezone
-    question.reviewed_at = datetime.now(timezone.utc)
-    db.commit()
-    db.refresh(question)
-    return question
+            from datetime import datetime, timezone
+            question.reviewed_at = datetime.now(timezone.utc)
+
+            db.commit()
+            db.refresh(question)
+
+        except Exception:
+            db.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to improve question"
+            )
+
+        return question
 
 
 from fastapi.responses import StreamingResponse
-from app.schemas.export import ExportRequest
-from app.services.export_service import (generate_questions_pdf)
+from Backend.app.schemas.export import ExportRequest
+from Backend.app.services.export_service import (generate_questions_pdf)
 
 @router.post("/export/pdf")
-def export_pdf(request: ExportRequest, db: Session = Depends(get_db)):
-    questions = (db.query(Question).filter(Question.id.in_(request.question_ids)).all())
+def export_pdf(request: ExportRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    questions = (
+    db.query(Question)
+    .filter(
+        Question.user_id == current_user.id,
+        Question.id.in_(request.question_ids)
+    )
+    .all()
+)
     if not questions:
         raise HTTPException(
             status_code=404,
@@ -233,17 +294,19 @@ def export_pdf(request: ExportRequest, db: Session = Depends(get_db)):
     )
 
 
-from fastapi.responses import StreamingResponse
-from app.services.docx_export_service import (generate_docx)
-from pydantic import BaseModel
-
-class ExportRequest(BaseModel):
-    question_ids: list[str]
+from Backend.app.services.docx_export_service import (generate_docx)
 
 
 @router.post("/export/docx")
-def export_docx(request: ExportRequest, db: Session = Depends(get_db)):
-    questions = (db.query(Question).filter(Question.id.in_(request.question_ids)).all())
+def export_docx(request: ExportRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    questions = (
+    db.query(Question)
+    .filter(
+        Question.user_id == current_user.id,
+        Question.id.in_(request.question_ids)
+    )
+    .all()
+)
     if not questions:
         raise HTTPException(
             status_code=404,
@@ -269,10 +332,12 @@ def export_all_pdf(
     topic: str | None = None,
     difficulty: str | None = None,
     status: str = "approved",
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
 
-    query = db.query(Question)
+    query = db.query(Question).filter(
+    Question.user_id == current_user.id)
 
     if topic:
         query = query.filter(Question.topic == topic)
@@ -308,10 +373,12 @@ def export_all_docx(
     topic: str | None = None,
     difficulty: str | None = None,
     status: str = "approved",
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
 
-    query = db.query(Question)
+    query = db.query(Question).filter(
+    Question.user_id == current_user.id)
 
     if topic:
         query = query.filter(Question.topic == topic)
@@ -342,3 +409,53 @@ def export_all_docx(
             "attachment; filename=question_bank.docx"
         }
     )
+
+
+from Backend.app.schemas.question import DeleteQuestionsRequest
+
+@router.delete("/")
+def delete_questions(
+    request: DeleteQuestionsRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    questions = (
+        db.query(Question)
+        .filter(
+            Question.user_id == current_user.id,
+            Question.id.in_(request.question_ids)
+        )
+        .all()
+    )
+
+    if not questions:
+        raise HTTPException(
+            status_code=404,
+            detail="No questions found"
+        )
+
+    deleted = len(questions)
+
+    try:
+        question_ids = [question.id for question in questions]
+
+        db.query(GenerationLog).filter(
+            GenerationLog.user_id == current_user.id,
+            GenerationLog.question_id.in_(question_ids)
+        ).delete(synchronize_session=False)
+
+        for question in questions:
+            db.delete(question)
+
+        db.commit()
+
+    except Exception:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to delete questions"
+        )
+
+    return {
+        "deleted": deleted
+    }

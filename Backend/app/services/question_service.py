@@ -2,7 +2,7 @@ from app.models.question import Question
 from app.schemas.question import CreateQuestionPayload
 
 
-def create_question(db, payload):
+def create_question(db, payload, user_id):
 
     payload = CreateQuestionPayload.model_validate(payload)
 
@@ -43,6 +43,7 @@ def create_question(db, payload):
 
     question = Question(
         topic=payload.topic,
+        user_id=user_id,
         difficulty=payload.difficulty,
         question_type="MCQ",
         question_text=payload.question,
