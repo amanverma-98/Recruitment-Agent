@@ -16,8 +16,8 @@ export default function DashboardLayout({
         <Sidebar />
 
         {/* Content wrapper taking up remaining width */}
-        <div className="pl-64">
-          <main className="p-8 max-w-[1400px] mx-auto">
+        <div className="pt-10 md:pt-0 md:pl-64">
+          <main className=" max-w-[1400px] mx-auto">
             {children}
           </main>
         </div>

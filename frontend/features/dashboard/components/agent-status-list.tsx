@@ -1,10 +1,10 @@
 import React from 'react';
 
 const agents = [
-  { name: 'Generator Agent', status: 'Healthy', color: 'bg-green-500 text-green-700 bg-green-50' },
-  { name: 'Evaluator Agent', status: 'Healthy', color: 'bg-green-500 text-green-700 bg-green-50' },
-  { name: 'Refiner Agent', status: 'Healthy', color: 'bg-green-500 text-green-700 bg-green-50' },
-  { name: 'Human Review', status: 'Active', color: 'bg-purple-500 text-purple-700 bg-purple-50' },
+  { name: 'Generator Agent', status: 'Healthy', color: 'bg-green-500 text-white bg-green-50' },
+  { name: 'Evaluator Agent', status: 'Healthy', color: 'bg-green-500 text-white bg-green-50' },
+  { name: 'Refiner Agent', status: 'Healthy', color: 'bg-green-500 text-white bg-green-50' },
+  { name: 'Human Review', status: 'Active', color: 'bg-purple-500 text-white bg-purple-50' },
 ];
 
 export default function AgentStatusList() {

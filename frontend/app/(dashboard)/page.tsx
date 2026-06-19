@@ -39,7 +39,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8 px-2 md:px-4 py-4">
+    <div className="space-y-8 px-2 md:px-4 pt-7">
       
       {/* Top Header Row */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

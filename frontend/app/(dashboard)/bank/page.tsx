@@ -42,7 +42,7 @@ export default function QuestionBankPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-7 px-5">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Question Bank</h1>
         <p className="text-sm text-gray-500 mt-1">Browse and manage all approved questions.</p>

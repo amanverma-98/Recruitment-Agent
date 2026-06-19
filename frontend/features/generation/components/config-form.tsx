@@ -161,19 +161,7 @@ export default function ConfigForm() {
         </div>
       </div>
 
-      {/* Additional Instructions */}
-      <div className="space-y-3 pt-4 border-t border-gray-100">
-        <label className="text-sm font-semibold text-gray-900 block">
-          Additional Instructions (Optional)
-        </label>
-        <textarea
-          value={store.additionalInstructions}
-          onChange={(e) => store.setAdditionalInstructions(e.target.value)}
-          placeholder="e.g., Focus on joins, aggregation, subqueries in SQL..."
-          className="w-full h-28 p-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm outline-none transition-all placeholder:text-gray-400 bg-gray-50/30"
-        />
-      </div>
-
+     
       {/* Actions */}
       <div className="pt-2">
         <button

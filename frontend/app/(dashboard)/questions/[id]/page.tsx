@@ -60,7 +60,7 @@ export default function QuestionDetailPage() {
   const scoreColors = question.ai_score != null ? getScoreColor(question.ai_score) : null;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="px-4 pt-7 space-y-6">
       {/* Back button */}
       <button
         onClick={() => router.back()}

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/useAuth';
 import { Loader2, Mail, Lock, User, UserPlus } from 'lucide-react';
-
+import Image from 'next/image';
 export default function RegisterPage() {
   const { register, isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
@@ -66,15 +66,19 @@ export default function RegisterPage() {
   return (
     <div className="relative z-10 w-full max-w-md">
       {/* Logo */}
-      <div className="flex items-center justify-center gap-3 mb-8">
-        <div className="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-purple-500/30">
-          R
-        </div>
-        <div>
-          <h1 className="text-white font-bold text-xl tracking-wide leading-none">RecruitAI</h1>
-          <span className="text-xs text-purple-400 font-medium">Agent Platform</span>
-        </div>
-      </div>
+       <div className="flex items-center justify-center gap-3 mb-8">
+              <div className="relative shrink-0">
+                <Image 
+                  src="/logo_black.png" 
+                  alt="RecruitAI Logo" 
+                  width={100} 
+                  height={100} 
+                  priority
+                  className="object-contain filter "
+                />
+              </div>
+            
+            </div>
 
       {/* Card */}
       <div className="bg-white/[0.05] backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
