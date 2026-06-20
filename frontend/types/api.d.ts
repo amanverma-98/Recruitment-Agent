@@ -26,8 +26,8 @@ export interface GenerateQuestionRequest {
 
 /** `POST /questions/bulk-generate` request body */
 export interface BulkGenerateRequest {
-  topic: string;
-  difficulty: string;
+  topics: string[];
+  difficulties: string[];
   count: number;
 }
 
