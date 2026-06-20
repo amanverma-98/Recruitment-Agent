@@ -3,21 +3,23 @@ from app.graph.graph import get_graph
 
 
 def resume_workflow(workflow_id, feedback):
+
     graph = get_graph()
 
     result = graph.invoke(
+
         Command(
             resume={
-                "approved": False,
                 "feedback": feedback
             }
         ),
+
         config={
             "configurable": {
                 "thread_id": workflow_id
             }
         }
+
     )
-    print(result)
 
     return result

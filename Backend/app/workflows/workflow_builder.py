@@ -102,9 +102,11 @@ TARGET_SCORE = 80
 MAX_ITERATIONS = 3
 def route_after_evaluation(state):
 
-    if state.get("feedback") is not None:
+    # After human review, never interrupt again.
+    if state.get("feedback"):
         return "save"
 
+    # Initial generation
     if state["score"] >= TARGET_SCORE:
         return "save"
 
@@ -124,18 +126,32 @@ def save_node(state):
 
 from langgraph.types import interrupt
 def human_review_node(state):
+
     feedback = interrupt(
         {
             "question": state["question"],
             "score": state["score"]
-        })
-    return {"feedback": feedback.get("feedback")}
+        }
+    )
+
+    return {
+        "feedback": feedback
+    }
 
 
 from app.agents.refiner import refine_question
 def apply_feedback_node(state):
-    refined = refine_question(state["question"], state["feedback"])
-    return {"question": refined}
+
+    refined = refine_question(
+        state["question"],
+        state["feedback"]
+    )
+
+    return {
+        "question": refined,
+        "refinement_iterations":
+            state["refinement_iterations"] + 1
+    }
 
 from langgraph.graph import StateGraph,END
 builder = StateGraph(QuestionState)
