@@ -342,6 +342,8 @@ def review_question(question_id: str,request: ReviewRequest,db: Session = Depend
                 question.workflow_id,
                 request.feedback
             )
+            
+            print(result)
 
             question.topic = result["topic"]
             question.difficulty = result["difficulty"]

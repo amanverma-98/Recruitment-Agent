@@ -18,5 +18,6 @@ def resume_workflow(workflow_id, feedback):
             }
         }
     )
+    print(result)
 
     return result
