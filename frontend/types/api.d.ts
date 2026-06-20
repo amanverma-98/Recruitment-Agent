@@ -26,8 +26,8 @@ export interface GenerateQuestionRequest {
 
 /** `POST /questions/bulk-generate` request body */
 export interface BulkGenerateRequest {
-  topic: string;
-  difficulty: string;
+  topics: string[];
+  difficulties: string[];
   count: number;
 }
 
@@ -59,6 +59,17 @@ export interface ExportPdfRequest {
 export interface ExportDocxRequest {
   question_ids: string[];
 }
+
+export interface ExportQuesWithoutDetailPdfRequest {
+  status: string;
+  topic:string;
+  difficulty:string;
+  include_answers: boolean;
+  include_explanations: boolean;
+}
+
+
+
 
 /** `DELETE /questions/` request body */
 export interface DeleteQuestionsRequest {

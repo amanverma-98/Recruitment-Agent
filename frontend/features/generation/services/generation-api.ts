@@ -15,10 +15,10 @@ export const bulkGenerateQuestions = async ({
   difficulties, 
   count 
 }: BulkGenerateInput): Promise<BulkGenerateResponse> => {
-  // Array ko comma-separated string mein convert kar rahe hain
+  // Send arrays directly — backend expects topics[] and difficulties[]
   return bulkGenerate({
-    topic: topics.join(', '),
-    difficulty: difficulties.join(', '),
-    count: count,
+    topics,
+    difficulties,
+    count,
   });
 };
