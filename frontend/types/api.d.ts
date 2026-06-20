@@ -60,6 +60,17 @@ export interface ExportDocxRequest {
   question_ids: string[];
 }
 
+export interface ExportQuesWithoutDetailPdfRequest {
+  status: string;
+  topic:string;
+  difficulty:string;
+  include_answers: boolean;
+  include_explanations: boolean;
+}
+
+
+
+
 /** `DELETE /questions/` request body */
 export interface DeleteQuestionsRequest {
   question_ids: string[];

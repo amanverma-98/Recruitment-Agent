@@ -7,6 +7,7 @@ import type {
   UpdateStatusRequest,
   ReviewRequest,
   ExportPdfRequest,
+  ExportQuesWithoutDetailPdfRequest,
 } from '@/types/api';
 
 // ── Fetch ──
@@ -79,3 +80,25 @@ export const exportQuestionsDocx = async (questionIds: string[]): Promise<Blob> 
   });
   return response.data;
 };
+
+export const exportQuesWithoutDetailPdf = async (payload:ExportQuesWithoutDetailPdfRequest)=>{
+
+  const {status , topic , difficulty , include_answers , include_explanations} = payload;
+  const response = await apiClient.get(`/questions/export/pdf/all` ,
+    {
+      params:payload,
+      responseType:'blob'
+    }
+  );
+  return response.data;
+}
+
+export const exportQuesWithoutDetailDocx = async (payload:ExportQuesWithoutDetailPdfRequest)=>{
+
+  const {status , topic , difficulty , include_answers , include_explanations} = payload;
+  const response = await apiClient.get('/questions/export/docx/all', {
+    params: payload,
+    responseType: 'blob'
+  });
+  return response.data;
+}
