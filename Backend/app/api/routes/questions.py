@@ -299,7 +299,7 @@ def update_status(question_id: str, request: UpdateStatusRequest, db: Session = 
 from app.schemas.question import ReviewRequest
 from app.workflows.resume_workflow import resume_workflow
 
-@router.patch("/{question_id}/review", response_model=QuestionResponse)
+@router.patch("/{question_id}/review")
 def review_question(question_id: str,request: ReviewRequest,db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     question = (
     db.query(Question)
@@ -316,7 +316,14 @@ def review_question(question_id: str,request: ReviewRequest,db: Session = Depend
         question.status = "approved"
 
     elif request.action == "reject":
-        question.status = "rejected"
+
+        db.delete(question)
+
+        db.commit()
+
+        return {
+            "message": "Question rejected and deleted successfully"
+        }
 
     elif request.action == "improve":
         if not request.feedback:
