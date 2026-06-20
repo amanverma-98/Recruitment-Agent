@@ -3,7 +3,11 @@ from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer)
 from reportlab.lib.styles import getSampleStyleSheet
 
 
-def generate_questions_pdf(questions):
+def generate_questions_pdf(questions,
+
+    include_answers=False,
+
+    include_explanations=False):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer)
     styles = getSampleStyleSheet()
@@ -20,9 +24,10 @@ def generate_questions_pdf(questions):
 
         for option in q.options:
             elements.append(Paragraph(option, styles["BodyText"]))
-
-        elements.append(Paragraph(f"Correct Answer: {q.correct_option}", styles["BodyText"]))
-        elements.append(Paragraph(q.explanation, styles["BodyText"]))
+        if include_answers:
+            elements.append(Paragraph(f"Correct Answer: {q.correct_option}", styles["BodyText"]))
+        if include_explanations:    
+            elements.append(Paragraph(q.explanation, styles["BodyText"]))
         elements.append(Spacer(1, 20))
 
     doc.build(elements)
