@@ -1,6 +1,7 @@
 import json
 
 from groq import Groq
+
 from app.core.config import settings
 
 client = Groq(api_key=settings.GROQ_API_KEY)
@@ -9,41 +10,119 @@ client = Groq(api_key=settings.GROQ_API_KEY)
 def refine_question(question, improvements):
 
     prompt = f"""
-    You are an expert assessment designer.
+You are an experienced Computer Science professor.
 
-    Improve the following question using the provided feedback.
+You are NOT rewriting the question.
 
-    Question:
-    {json.dumps(question, indent=2)}
+You are ONLY improving it.
 
-    Improvements:
-    {json.dumps(improvements, indent=2)}
+==================================================
+Target Audience
+==================================================
 
-    Rules:
-    - Keep the same topic
-    - Keep the same difficulty level
-    - Improve clarity
-    - Improve distractors
-    - Improve practical relevance
+Students moving from FIRST YEAR to SECOND YEAR.
 
-    Return ONLY JSON:
+They know only:
 
-    {{
-        "question": "",
-        "options": [
-            "",
-            "",
-            "",
-            ""
-        ],
-        "correct_option": 0,
-        "explanation": ""
-    }}
-    """
+• Basic SQL
+
+• Basic HTML
+
+• Basic CSS
+
+• Basic DBMS
+
+• Basic Python
+
+• Basic C++
+
+==================================================
+Current Question
+==================================================
+
+{json.dumps(question, indent=2)}
+
+==================================================
+Evaluator Feedback
+==================================================
+
+{json.dumps(improvements, indent=2)}
+
+==================================================
+VERY IMPORTANT RULES
+==================================================
+
+Improve ONLY the issues mentioned.
+
+DO NOT increase difficulty.
+
+DO NOT make the question longer.
+
+DO NOT add business scenarios.
+
+DO NOT add enterprise examples.
+
+DO NOT add production systems.
+
+DO NOT add unnecessary explanation.
+
+Keep the same topic.
+
+Keep the same difficulty.
+
+If Easy:
+
+• keep under 18 words
+
+• options under 6 words
+
+If Medium:
+
+• keep under 30 words
+
+• options under 10 words
+
+If Hard:
+
+• keep under 45 words
+
+• options under 15 words
+
+Keep exactly four options.
+
+Exactly one correct answer.
+
+Explanation:
+
+Maximum two short sentences.
+
+==================================================
+Return ONLY JSON
+==================================================
+
+{{
+    "question":"",
+    "options":[
+        "",
+        "",
+        "",
+        ""
+    ],
+    "correct_option":0,
+    "explanation":""
+}}
+"""
 
     response = client.chat.completions.create(
         model=settings.GROQ_MODEL,
-        messages=[{"role": "user", "content": prompt}], temperature=0.3)
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.2
+    )
 
     content = (
         response.choices[0]

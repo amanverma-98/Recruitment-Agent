@@ -1,11 +1,12 @@
 import json
+from typing import List
+
 from groq import Groq
+from pydantic import BaseModel, field_validator
+
 from app.core.config import settings
 
 client = Groq(api_key=settings.GROQ_API_KEY)
-
-from pydantic import BaseModel, field_validator
-from typing import List
 
 
 class MCQSchema(BaseModel):
@@ -18,104 +19,186 @@ class MCQSchema(BaseModel):
     @classmethod
     def validate_correct_option(cls, value):
         if value < 0 or value > 3:
-            raise ValueError(
-                "correct_option must be between 0 and 3"
-            )
+            raise ValueError("correct_option must be between 0 and 3")
         return value
 
 
 def generate_mcq(topic: str, difficulty: str):
 
+    difficulty = difficulty.capitalize()
+
     prompt = f"""
-    Generate EXACTLY ONE recruitment-level MCQ.
+You are an expert Computer Science professor.
 
-    Topic: {topic}
-    Difficulty: {difficulty}
+Generate EXACTLY ONE Multiple Choice Question.
 
-    You are generating a Multiple Choice Question for candidate assessment.
+=========================================================
+TARGET AUDIENCE
+=========================================================
 
-    CRITICAL REQUIREMENTS:
+Students moving from FIRST YEAR to SECOND YEAR.
 
-    1. The question MUST be answerable by selecting ONE of the provided options.
+Assume they only know:
 
-    2. The candidate must NEVER be required to:
+• Basic SQL
+• Basic HTML
+• Basic CSS
+• Basic Python
+• Basic C++
+• Basic DBMS
 
-    * Write SQL
-    * Construct SQL
-    * Complete SQL
-    * Create a query
-    * Design a query
-    * Implement code
-    * Write code
-    * Predict results from a query not shown in the options
+DO NOT generate interview questions for experienced developers.
 
-    3. STRICTLY FORBIDDEN QUESTION TYPES:
+DO NOT generate enterprise-level questions.
 
-    ❌ "Write a query..."
-    ❌ "Create a query..."
-    ❌ "Which query would return..."
-    ❌ "Given a table, return..."
-    ❌ "How would you retrieve..."
-    ❌ "What query should be used..."
-    ❌ "Generate a query..."
-    ❌ "Construct a query..."
-    ❌ Open-ended questions
-    ❌ Questions requiring manual coding
+DO NOT assume production experience.
 
-    4. ALLOWED QUESTION TYPES:
+Questions should resemble:
 
-    ✅ "Which SQL clause is used to group rows?"
-    ✅ "Which JOIN returns all rows from both tables?"
-    ✅ "Which statement about indexes is correct?"
-    ✅ "What will be the output of the following query?"
-    ✅ "Which constraint prevents duplicate values?"
-    ✅ "Which SQL command adds a new row to a table?"
+• University exams
+• Internship screening tests
+• NPTEL quizzes
+• GeeksForGeeks beginner MCQs
+• Coding Ninjas beginner assessments
 
-    5. Question Quality Requirements:
+=========================================================
+TOPIC
+=========================================================
 
-    * Clear and concise
-    * Single correct answer
-    * No ambiguity
-    * Real interview style
-    * Appropriate for recruitment assessments
-    * Difficulty must match the requested level
-    * Options must be realistic distractors
-    * Avoid trick questions
+{topic}
 
-    6. Option Requirements:
+=========================================================
+DIFFICULTY
+=========================================================
 
-    * Exactly 4 options
-    * Exactly 1 correct option
-    * No duplicate options
-    * Similar length options when possible
-    * Options must be mutually exclusive
+{difficulty}
 
-    7. Explanation Requirements:
+Difficulty Rules
 
-    * 1–3 sentences
-    * Explain why the correct answer is correct
-    * Do not discuss every option
+---------------------------------------------------------
+EASY
+---------------------------------------------------------
 
-    Return ONLY valid JSON.
+• One concept only
+• Direct question
+• No scenario
+• Maximum 18 words
+• Options: 2-6 words each
+• Explanation under 30 words
 
-    Do NOT return markdown.
-    Do NOT return code fences.
-    Do NOT return any text outside JSON.
+Examples:
 
-    Output format:
+Which SQL clause filters rows?
 
-    {{
+Which HTML tag creates a paragraph?
+
+---------------------------------------------------------
+MEDIUM
+---------------------------------------------------------
+
+• Small scenario allowed
+• Maximum 30 words
+• Tests understanding
+• Options 3-8 words
+• Explanation under 35 words
+
+---------------------------------------------------------
+HARD
+---------------------------------------------------------
+
+• Small practical scenario
+• Maximum 45 words
+• Requires reasoning
+• NOT enterprise level
+• NOT advanced optimization
+• Options 4-10 words
+• Explanation under 40 words
+
+=========================================================
+STRICTLY FORBIDDEN
+=========================================================
+
+Never generate questions asking students to:
+
+❌ Write SQL
+❌ Create SQL
+❌ Construct SQL
+❌ Write code
+❌ Predict output from code
+❌ Complete code
+❌ Fill missing query
+❌ Create HTML
+❌ Write CSS
+❌ Design algorithms
+
+Also avoid:
+
+❌ Huge paragraphs
+
+❌ Tricky wording
+
+❌ Ambiguous questions
+
+❌ Multiple correct answers
+
+❌ "Choose all"
+
+❌ "Select two"
+
+=========================================================
+OPTION RULES
+=========================================================
+
+Exactly 4 options.
+
+Exactly ONE correct answer.
+
+Options should be similar in length.
+
+No duplicate options.
+
+No "All of the above".
+
+No "None of the above".
+
+=========================================================
+QUESTION QUALITY
+=========================================================
+
+The question must:
+
+• Be short
+
+• Be clear
+
+• Test ONE concept
+
+• Match requested difficulty
+
+• Be suitable for classroom assessment
+
+=========================================================
+OUTPUT FORMAT
+=========================================================
+
+Return ONLY JSON.
+
+No markdown.
+
+No explanation outside JSON.
+
+{{
     "question": "",
     "options": [
-    "",
-    "",
-    "",
-    ""
+        "",
+        "",
+        "",
+        ""
     ],
     "correct_option": 0,
     "explanation": ""
-    }}
-    """
+}}
+"""
 
     response = client.chat.completions.create(
         model=settings.GROQ_MODEL,
@@ -125,23 +208,23 @@ def generate_mcq(topic: str, difficulty: str):
                 "content": prompt
             }
         ],
-        temperature=0.7
+        temperature=0.4
     )
 
     content = (
-    response.choices[0]
-    .message
-    .content
-    .replace("```json", "")
-    .replace("```", "")
-    .strip()
+        response.choices[0]
+        .message.content
+        .replace("```json", "")
+        .replace("```", "")
+        .strip()
     )
 
     print("RAW GROQ RESPONSE")
     print(content)
-    print("=" * 50)
+    print("=" * 80)
 
     data = json.loads(content)
+
     validated = MCQSchema.model_validate(data)
 
     return validated.model_dump()

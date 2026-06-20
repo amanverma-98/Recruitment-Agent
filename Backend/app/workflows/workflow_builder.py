@@ -30,18 +30,52 @@ from app.agents.evaluator import evaluate_question
 
 
 def evaluate_node(state):
-    evaluation = evaluate_question(state["question"])
+
+    evaluation = evaluate_question(
+        state["question"]
+    )
 
     score = evaluation["score"]
 
-    question_text = state["question"]["question"]
-    options = state["question"]["options"]
+    question = state["question"]
+    if len(set(question["options"])) != 4:
+        score -= 25
 
-    if len(question_text) > 150:
-        score -= 5
+    if not (0 <= question["correct_option"] <= 3):
+        score -= 50    
 
-    if max(len(option) for option in options) > 120:
-        score -= 5
+    question_length = len(question["question"].split())
+
+    longest_option = max(
+        len(option.split())
+        for option in question["options"]
+    )
+
+    difficulty = state["difficulty"].lower()
+
+    if difficulty == "easy":
+
+        if question_length > 18:
+            score -= 10
+
+        if longest_option > 6:
+            score -= 10
+
+    elif difficulty == "medium":
+
+        if question_length > 30:
+            score -= 8
+
+        if longest_option > 10:
+            score -= 8
+
+    elif difficulty == "hard":
+
+        if question_length > 45:
+            score -= 6
+
+        if longest_option > 15:
+            score -= 6
 
     score = max(0, min(score, 100))
 
@@ -64,15 +98,15 @@ def refine_node(state):
 
 
 
-TARGET_SCORE = 90
-MAX_ITERATIONS = 5
+TARGET_SCORE = 80
+MAX_ITERATIONS = 3
 def route_after_evaluation(state):
 
     if state.get("feedback") is not None:
         return "save"
 
     if state["score"] >= TARGET_SCORE:
-        return "human_review"
+        return "save"
 
     if state["refinement_iterations"] >= MAX_ITERATIONS:
         return "human_review"
@@ -83,8 +117,9 @@ def route_after_evaluation(state):
 def save_node(state):
     return {
         "status": "pending_review",
-        "workflow_stage": "completed"
-        }
+        "workflow_stage": "completed",
+        "feedback": None
+    }
 
 
 from langgraph.types import interrupt
