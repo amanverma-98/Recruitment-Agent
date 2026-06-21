@@ -297,8 +297,7 @@ def update_status(question_id: str, request: UpdateStatusRequest, db: Session = 
 
 
 from app.schemas.question import ReviewRequest
-from app.workflows.resume_workflow import resume_workflow
-
+from app.workflows.improvement_workflow import run_improvement_workflow
 @router.patch("/{question_id}/review")
 def review_question(question_id: str,request: ReviewRequest,db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     question = (
@@ -337,25 +336,33 @@ def review_question(question_id: str,request: ReviewRequest,db: Session = Depend
                 status_code=400,
                 detail="Question has no workflow checkpoint"
             )
+        import traceback
         try:
-            result = resume_workflow(
-                question.workflow_id,
+            payload = {
+                "question": question.question_text,
+                "options": question.options,
+                "correct_option": question.correct_option,
+                "explanation": question.explanation,
+            }
+
+            result = run_improvement_workflow(
+                payload,
                 request.feedback
             )
             
             print(result)
 
-            question.topic = result["topic"]
-            question.difficulty = result["difficulty"]
-            question.question_text = result["question"]["question"]
-            question.options = result["question"]["options"]
-            question.correct_option = result["question"]["correct_option"]
-            question.explanation = result["question"]["explanation"]
-            question.ai_score = result["score"]
-            question.refinement_iterations = result["refinement_iterations"]
-            question.status = "pending_review"
+            question.question_text = result["question"]
+            question.options = result["options"]
+            question.correct_option = result["correct_option"]
+            question.explanation = result["explanation"]
+
+            question.ai_score = result["ai_score"]
             question.strengths = result["strengths"]
-            question.evaluation_feedback = result["improvements"]
+            question.evaluation_feedback = result["evaluation_feedback"]
+
+            question.refinement_iterations += 1
+            question.status = "pending_review"
             question.review_feedback = request.feedback
 
             from datetime import datetime, timezone
@@ -364,11 +371,13 @@ def review_question(question_id: str,request: ReviewRequest,db: Session = Depend
             db.commit()
             db.refresh(question)
 
-        except Exception:
+
+        except Exception as e:
+            traceback.print_exc()
             db.rollback()
             raise HTTPException(
                 status_code=500,
-                detail="Failed to improve question"
+                detail=str(e)
             )
 
         return question

@@ -16,6 +16,8 @@ You are NOT rewriting the question.
 
 You are ONLY improving it.
 
+ONLY modify exactly what the reviewer requested.
+
 ==================================================
 Target Audience
 ==================================================
@@ -52,49 +54,91 @@ Evaluator Feedback
 VERY IMPORTANT RULES
 ==================================================
 
-Improve ONLY the issues mentioned.
+Your job is to make the MINIMUM changes required.
 
-DO NOT increase difficulty.
+Read the reviewer feedback carefully.
 
-DO NOT make the question longer.
+Modify ONLY the parts explicitly requested by the reviewer.
 
-DO NOT add business scenarios.
+Everything else MUST remain unchanged.
 
-DO NOT add enterprise examples.
+For example:
 
-DO NOT add production systems.
+If the reviewer asks to:
 
-DO NOT add unnecessary explanation.
+• shorten options
+→ modify ONLY the options
 
-Keep the same topic.
+• improve options
+→ modify ONLY the options
 
-Keep the same difficulty.
+• improve the explanation
+→ modify ONLY the explanation
 
-If Easy:
+• make the question easier
+→ modify ONLY the question and options as needed
 
-• keep under 18 words
+• make the question harder
+→ modify ONLY the question and options as needed
 
-• options under 6 words
+• improve grammar
+→ correct grammar only
 
-If Medium:
+• fix spelling
+→ correct spelling only
 
-• keep under 30 words
+• change HTML tags
+→ modify only the requested HTML text
 
-• options under 10 words
+• use proper syntax
+→ modify only the syntax requested
 
-If Hard:
+If the reviewer does NOT ask to modify something,
+DO NOT change it.
 
-• keep under 45 words
+Never make unnecessary improvements.
 
-• options under 15 words
+Never rewrite the entire question just because you think it can be better.
 
-Keep exactly four options.
+Never introduce new scenarios unless explicitly requested.
 
-Exactly one correct answer.
+Never change the topic.
+
+Never change the difficulty unless requested.
+
+Never change the correct answer unless required by the requested modification.
+
+Never replace the explanation unless the reviewer asked for it or the correct answer changed.
+
+Keep the original intent of the question.
+
+==================================================
+Question Length Rules
+==================================================
+
+Easy:
+• Question ≤18 words
+• Each option ≤6 words
+
+Medium:
+• Question ≤30 words
+• Each option ≤10 words
+
+Hard:
+• Question ≤45 words
+• Each option ≤15 words
+
+==================================================
+Output Rules
+==================================================
+
+Exactly 4 options.
+
+Exactly 1 correct option.
 
 Explanation:
+Maximum 2 short sentences.
 
-Maximum two short sentences.
 
 ==================================================
 Return ONLY JSON

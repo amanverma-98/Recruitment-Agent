@@ -13,5 +13,9 @@ checkpointer = _checkpointer_cm.__enter__()
 # CREATE TABLES IF THEY DON'T EXIST
 checkpointer.setup()
 
+graph = builder.compile(
+    checkpointer=checkpointer
+)
+
 def get_graph():
-    return builder.compile(checkpointer=checkpointer)
+    return graph
