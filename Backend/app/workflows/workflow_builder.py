@@ -121,37 +121,42 @@ MAX_ITERATIONS = 3
 def route_after_evaluation(state: QuestionState):
 
     if state["score"] >= TARGET_SCORE:
-        return "save"
+        return "human_review"
 
     if state["refinement_iterations"] >= MAX_ITERATIONS:
-        return "save"
+        return "human_review"
 
     return "refine"
 
 
-def save_node(state):
+def human_review_node(state: QuestionState):
     return {
         "status": "pending_review",
-        "workflow_stage": "completed"
+        "workflow_stage": "human_review"
     }
 
 
-from langgraph.graph import StateGraph,END
+from langgraph.graph import StateGraph, END
+
 builder = StateGraph(QuestionState)
+
 builder.add_node("generate", generate_node)
 builder.add_node("evaluate", evaluate_node)
 builder.add_node("refine", refine_node)
-builder.add_node("save", save_node)
+builder.add_node("human_review", human_review_node)
 
 builder.set_entry_point("generate")
+
 builder.add_edge("generate", "evaluate")
+
 builder.add_conditional_edges(
     "evaluate",
     route_after_evaluation,
     {
         "refine": "refine",
-        "save": "save"
+        "human_review": "human_review"
     }
 )
+
 builder.add_edge("refine", "evaluate")
-builder.add_edge("save", END)
+builder.add_edge("human_review", END)
