@@ -12,9 +12,9 @@ import type {
 
 // ── Fetch ──
 
-export const getQuestions = async (status?: string): Promise<QuestionResponse[]> => {
-  const { data } = await apiClient.get<QuestionResponse[]>('/questions/', {
-    params: status ? { status } : undefined,
+export const getQuestions = async (status:string): Promise<QuestionResponse[]> => {
+  const { data } = await apiClient.get<QuestionResponse[]>('/questions/',{
+    params:{status}
   });
   return data;
 };

@@ -1,23 +1,24 @@
-import { useMutation } from '@tanstack/react-query'; // ya jo bhi aap library use kar rahe hain
-import { useRouter } from 'next/navigation'; // ya 'next/navigation'
-import { bulkGenerateQuestions, BulkGenerateInput } from '../services/generation-api'; // path sahi kar lena
+import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { bulkGenerateQuestions, BulkGenerateInput } from '../services/generation-api';
 import type { BulkGenerateResponse } from '@/types/api';
+import { useToast } from '@/lib/hooks/use-toast';
 
 export const useBulkGenerate = () => {
   const router = useRouter();
+  const { showToast } = useToast();
 
   return useMutation<BulkGenerateResponse, Error, BulkGenerateInput>({
-    // Ab direct single API hit hogi comma-separated string ke saath
     mutationFn: ({ topics, difficulties, count }) =>
       bulkGenerateQuestions({ topics, difficulties, count }),
     
     onSuccess: (data) => {
-      console.log(`Generated ${data.generated} questions, ${data.failed} failed`);
-      // Generation shuru hone ke baad user ko Review Queue mein redirect kiya
+      showToast(`${data.generated} questions generated successfully.`, 'success');
+      // Redirect user to Review Queue after generation
       router.push('/review');
     },
-    onError: (error) => {
-      console.error("Generation failed:", error);
-    }
+    onError: () => {
+      showToast('Failed to generate questions. Please check your connection.', 'error');
+    },
   });
 };

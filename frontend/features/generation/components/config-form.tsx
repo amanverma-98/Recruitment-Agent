@@ -72,7 +72,7 @@ export default function ConfigForm() {
                   className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border text-left
                     ${
                       isSelected
-                        ? "bg-purple-50 border-purple-200 text-purple-700 shadow-sm shadow-purple-100"
+                        ? "bg-purple-100 border-purple-200 text-purple-700 shadow-sm shadow-purple-100"
                         : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                     }`}
                 >
@@ -110,7 +110,7 @@ export default function ConfigForm() {
                     className={`flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border
                       ${
                         isSelected
-                          ? "bg-purple-50 border-purple-200 text-purple-700 shadow-sm shadow-purple-100"
+                          ? "bg-purple-100 border-purple-200 text-purple-800 shadow-sm shadow-purple-100"
                           : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
                       }`}
                   >
@@ -129,7 +129,7 @@ export default function ConfigForm() {
             <div className="relative">
               <input
                 type="number"
-                min={1}
+                min={0}
                 max={50}
                 value={store.questionsPerTopic}
                 onChange={(e) =>
