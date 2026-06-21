@@ -72,26 +72,26 @@ def evaluate_node(state: QuestionState):
 
     if difficulty == "easy":
 
-        if question_length > 18:
-            score -= 10
+        if question_length > 20:
+            score -= 7
 
-        if longest_option > 6:
-            score -= 10
+        if longest_option > 9:
+            score -= 7
 
     elif difficulty == "medium":
 
-        if question_length > 30:
+        if question_length > 35:
             score -= 8
 
-        if longest_option > 10:
+        if longest_option > 14:
             score -= 8
 
     elif difficulty == "hard":
 
-        if question_length > 45:
+        if question_length > 50:
             score -= 6
 
-        if longest_option > 15:
+        if longest_option > 20:
             score -= 6
 
     score = max(0, min(score, 100))
