@@ -347,6 +347,7 @@ def review_question(question_id: str,request: ReviewRequest,db: Session = Depend
 
             result = run_improvement_workflow(
                 payload,
+                question.evaluator_feedback,
                 request.feedback
             )
             
