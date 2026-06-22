@@ -18,6 +18,8 @@ You are ONLY improving it.
 
 ONLY modify exactly what the reviewer requested.
 
+Do not modify anything by yourself only modify what the reviewer explicitly asked you to modify.
+
 ==================================================
 Target Audience
 ==================================================
