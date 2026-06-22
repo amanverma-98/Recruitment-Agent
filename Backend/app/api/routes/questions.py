@@ -141,7 +141,7 @@ def bulk_generate(request: BulkGenerateRequest, current_user: User = Depends(get
 
     generated_questions = []
     failed = 0
-    with ThreadPoolExecutor(max_workers=3) as executor:
+    with ThreadPoolExecutor(max_workers=1) as executor:
         futures = [
             executor.submit(
                 generate_single_question,
