@@ -36,30 +36,25 @@ Generate EXACTLY ONE Multiple Choice Question.
 TARGET AUDIENCE
 =========================================================
 
-Students moving from FIRST YEAR to SECOND YEAR.
+Students moving to SECOND YEAR.
 
-Assume they only know:
+Assume they know only:
 
 • Basic SQL
 • Basic HTML
 • Basic CSS
 • Basic Python
-• Basic C++
-• Basic DBMS
+• Basic C
+• Statistics
+• Probabilty
+• Aptitude
+• Basic Javascript
 
-DO NOT generate interview questions for experienced developers.
+Generate questions suitable for:
 
-DO NOT generate enterprise-level questions.
-
-DO NOT assume production experience.
-
-Questions should resemble:
-
-• University exams
+• University examinations
 • Internship screening tests
-• NPTEL quizzes
-• GeeksForGeeks beginner MCQs
-• Coding Ninjas beginner assessments
+• Beginner coding assessments
 
 =========================================================
 TOPIC
@@ -73,118 +68,103 @@ DIFFICULTY
 
 {difficulty}
 
-Difficulty Rules
+Difficulty Guidelines
 
----------------------------------------------------------
-EASY
----------------------------------------------------------
-
+Easy
 • One concept only
 • Direct question
 • No scenario
 • Maximum 24 words
-• Options: 4-9 words each
-• Explanation under 50 words
 
-Examples:
-
-Which SQL clause filters rows?
-
-Which HTML tag creates a paragraph?
-
----------------------------------------------------------
-MEDIUM
----------------------------------------------------------
-
+Medium
 • Small scenario allowed
-• Moderate complexity
-• Maximum 50 words
 • Tests understanding
-• Options 5-12 words
-• Explanation under 55 words
+• Maximum 50 words
+• Moderately complex questions allowed
 
----------------------------------------------------------
-HARD
----------------------------------------------------------
-
+Hard
 • Small practical scenario
-• Slightly complex question
-• Maximum 80 words
 • Requires reasoning
-• NOT enterprise level
-• Options 8-18 words
-• Explanation under 70 words
+• Maximum 80 words
+• No enterprise-level knowledge
+• Slightly complex questions allowed
 
 =========================================================
-STRICTLY FORBIDDEN
+QUESTION RULES
 =========================================================
 
-Never generate questions asking students to:
+The question must:
 
-❌ Write SQL
-❌ Create SQL
-❌ Construct SQL
-❌ Write code
-❌ Predict output from code
-❌ Complete code
-❌ Fill missing query
-❌ Create HTML
-❌ Write CSS
-❌ Design algorithms
+• Test exactly ONE concept.
+• Be technically correct.
+• Match the requested difficulty.
+• Be clear and concise.
+• Have exactly ONE correct answer.
+• Avoid ambiguity.
+• Avoid trick wording.
+• Be answerable without writing code.
 
-Also avoid:
+Never ask students to:
 
-❌ Huge paragraphs
-
-❌ Tricky wording
-
-❌ Ambiguous questions
-
-❌ Multiple correct answers
-
-❌ "Choose all"
-
-❌ "Select two"
+• Write code
+• Write SQL
+• Construct queries
+• Complete code
+• Design algorithms
+• Create HTML or CSS
 
 =========================================================
 OPTION RULES
 =========================================================
 
-Exactly 4 options.
+Generate EXACTLY FOUR options.
 
-Exactly ONE correct answer.
+The options must:
 
-Options should be similar in length.
+• Belong to the same category.
+• Be similar in wording and length.
+• Be concise.
+• Contain only the essential term or phrase.
+• Avoid unnecessary repeated words.
+• Avoid explanations inside options.
+• Avoid overlapping meanings.
+• Avoid duplicate options.
+• Avoid obviously incorrect distractors.
+• Be plausible enough that students must understand the concept to choose correctly.
 
-No duplicate options.
+Never use:
 
-No "All of the above".
-
-No "None of the above".
-
-=========================================================
-QUESTION QUALITY
-=========================================================
-
-The question must:
-
-• Be clear
-
-• Test ONE concept
-
-• Match requested difficulty
-
-• Be suitable for classroom assessment
+• Multiple correct answers
 
 =========================================================
-OUTPUT FORMAT
+EXPLANATION
 =========================================================
 
-Return ONLY JSON.
+Write a short explanation (maximum three sentences).
 
-No markdown.
+Explain only why the correct answer is correct.
 
-No explanation outside JSON.
+=========================================================
+QUALITY CHECK
+=========================================================
+
+Before producing the final answer, silently verify that:
+
+• The concept is technically correct.
+• Only one option is correct.
+• Distractors are realistic.
+• No option accidentally becomes correct.
+• Options follow the same style.
+• The question matches the requested difficulty.
+• The explanation matches the correct answer.
+
+If any check fails, internally improve the question before returning the final result.
+
+=========================================================
+OUTPUT
+=========================================================
+
+Return ONLY valid JSON.
 
 {{
     "question": "",

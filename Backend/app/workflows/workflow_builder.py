@@ -23,7 +23,7 @@ class QuestionState(TypedDict):
 
     workflow_stage: str
 
-    review_feedback: list[str] | None
+    review_feedback: Annotated[list[str], add]
 
     approved: bool | None
 
@@ -107,7 +107,7 @@ def evaluate_node(state: QuestionState):
 
 from app.agents.refiner import refine_question
 def refine_node(state: QuestionState):
-    refined = refine_question(state["question"],state["improvements"])
+    refined = refine_question(state["question"],state["improvements"], state["review_feedback"])
     return {
         "question": refined,
         "refinement_iterations":
@@ -120,10 +120,7 @@ TARGET_SCORE = 80
 MAX_ITERATIONS = 3
 def route_after_evaluation(state: QuestionState):
 
-    if state["score"] >= TARGET_SCORE:
-        return "human_review"
-
-    if state["refinement_iterations"] >= MAX_ITERATIONS:
+    if (state["score"] >= TARGET_SCORE or state["refinement_iterations"] >= MAX_ITERATIONS):
         return "human_review"
 
     return "refine"

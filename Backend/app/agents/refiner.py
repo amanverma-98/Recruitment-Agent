@@ -7,155 +7,196 @@ from app.core.config import settings
 client = Groq(api_key=settings.GROQ_API_KEY)
 
 
-def refine_question(question, improvements):
+def refine_question(question, improvements, reviewer_feedback):
 
     prompt = f"""
 You are an experienced Computer Science professor.
 
-You are NOT rewriting the question.
+Your task is to improve an existing multiple-choice question.
 
-You are ONLY improving it.
+You are **NOT** generating a new question.
 
-ONLY modify exactly what the reviewer requested.
+You are **NOT** redesigning the assessment.
 
-Do not modify anything by yourself only modify what the reviewer explicitly asked you to modify.
+Your job is to apply the reviewer feedback while preserving the original question as much as possible.
 
 ==================================================
-Target Audience
-==================================================
+TARGET AUDIENCE
+===============
 
 Students moving from FIRST YEAR to SECOND YEAR.
 
-They know only:
+Assume they know only:
 
 • Basic SQL
-
 • Basic HTML
-
 • Basic CSS
-
 • Basic DBMS
-
 • Basic Python
-
 • Basic C++
 
 ==================================================
-Current Question
-==================================================
+CURRENT QUESTION
+================
 
 {json.dumps(question, indent=2)}
 
 ==================================================
-Evaluator Feedback
+REVIEWER FEEDBACK (HIGHEST PRIORITY)
+====================================
+
+{json.dumps(reviewer_feedback, indent=2)}
+
 ==================================================
+EVALUATOR FEEDBACK (SECONDARY)
+==============================
 
 {json.dumps(improvements, indent=2)}
 
 ==================================================
-VERY IMPORTANT RULES
+PRIMARY OBJECTIVE
+=================
+
+Make the SMALLEST possible changes required to satisfy the reviewer.
+
+Preserve everything that is already correct.
+
+Do not redesign the question.
+
 ==================================================
+FEEDBACK PRIORITY
+=================
 
-Your job is to make the MINIMUM changes required.
+1. Reviewer feedback ALWAYS has the highest priority.
 
-Read the reviewer feedback carefully.
+2. Evaluator feedback is only additional guidance.
 
-Modify ONLY the parts explicitly requested by the reviewer.
+3. Use evaluator feedback ONLY if it helps satisfy the reviewer.
 
-Everything else MUST remain unchanged.
+4. If evaluator feedback conflicts with reviewer feedback, ignore the evaluator.
 
-For example:
+5. Never modify something that the reviewer did not ask to modify.
 
-If the reviewer asks to:
+==================================================
+MODIFICATION RULES
+==================
 
-• shorten options
-→ modify ONLY the options
+Modify ONLY the parts explicitly required.
 
-• improve options
-→ modify ONLY the options
+Examples of allowed modifications:
 
-• improve the explanation
-→ modify ONLY the explanation
+• Question wording
+• Options
+• Explanation
+• Grammar
+• Spelling
+• Formatting
+• Difficulty (only if requested)
+• Technical correctness (only if required)
 
-• make the question easier
-→ modify ONLY the question and options as needed
+Everything else must remain unchanged.
 
-• make the question harder
-→ modify ONLY the question and options as needed
+==================================================
+STRICT RULES
+============
 
-• improve grammar
-→ correct grammar only
+Never rewrite the entire question.
 
-• fix spelling
-→ correct spelling only
+Never introduce new concepts.
 
-• change HTML tags
-→ modify only the requested HTML text
+Never introduce new scenarios.
 
-• use proper syntax
-→ modify only the syntax requested
+Never add business or enterprise examples.
 
-If the reviewer does NOT ask to modify something,
-DO NOT change it.
-
-Never make unnecessary improvements.
-
-Never rewrite the entire question just because you think it can be better.
-
-Never introduce new scenarios unless explicitly requested.
+Never increase complexity unless requested.
 
 Never change the topic.
 
-Never change the difficulty unless requested.
+Never change the learning objective.
 
-Never change the correct answer unless required by the requested modification.
+Never change the correct answer unless required.
 
-Never replace the explanation unless the reviewer asked for it or the correct answer changed.
+Never change the explanation unless:
 
-Keep the original intent of the question.
+• the reviewer requested it, or
+• the correct answer changed.
+
+Never modify unrelated fields simply because you think they can be improved.
 
 ==================================================
-Question Length Rules
-==================================================
+QUESTION QUALITY
+================
 
-Easy:
+After applying the requested changes ensure:
+
+• Exactly ONE concept is tested.
+
+• Exactly FOUR options exist.
+
+• Exactly ONE option is correct.
+
+• Distractors remain technically valid.
+
+• Options are consistent in wording and style.
+
+• The explanation matches the correct answer.
+
+==================================================
+LENGTH RULES
+============
+
+Easy
+
 • Question ≤18 words
-• Each option ≤6 words
 
-Medium:
+• Options ≤6 words
+
+Medium
+
 • Question ≤30 words
-• Each option ≤10 words
 
-Hard:
+• Options ≤10 words
+
+Hard
+
 • Question ≤45 words
-• Each option ≤15 words
+
+• Options ≤15 words
 
 ==================================================
-Output Rules
+FINAL VALIDATION
+================
+
+Before producing the final answer, silently verify:
+
+✓ Every reviewer request has been satisfied.
+
+✓ Only the necessary fields were modified.
+
+✓ No unrelated content changed.
+
+✓ Exactly one correct answer exists.
+
+✓ The explanation matches the correct answer.
+
+If any unrelated field changed, restore its original value before returning the final result.
+
 ==================================================
+OUTPUT
+======
 
-Exactly 4 options.
-
-Exactly 1 correct option.
-
-Explanation:
-Maximum 2 short sentences.
-
-
-==================================================
-Return ONLY JSON
-==================================================
+Return ONLY valid JSON.
 
 {{
-    "question":"",
-    "options":[
-        "",
-        "",
-        "",
-        ""
-    ],
-    "correct_option":0,
-    "explanation":""
+"question": "",
+"options": [
+"",
+"",
+"",
+""
+],
+"correct_option": 0,
+"explanation": ""
 }}
 """
 

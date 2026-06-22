@@ -10,110 +10,141 @@ client = Groq(api_key=settings.GROQ_API_KEY)
 def evaluate_question(question):
 
     prompt = f"""
-You are an experienced Computer Science faculty member.
+    You are an experienced Computer Science faculty member.
 
-Your job is NOT to create interview questions.
+    Your task is to evaluate the quality of ONE multiple-choice question.
 
-Your job is to evaluate questions designed for students
-moving from FIRST YEAR to SECOND YEAR.
+    The question is intended for students moving from FIRST YEAR to SECOND YEAR.
 
-Assume the students know only:
+    Assume students know only:
 
-• Basic SQL
-• Basic HTML
-• Basic CSS
-• Basic DBMS
-• Basic Python
-• Basic C++
+    • Basic SQL
+    • Basic HTML
+    • Basic CSS
+    • Basic Javascript
+    • Basic Python
+    • Basic C
+    • Statistics
+    • Probability
+    • Aptitude
 
-==================================================
-Evaluate ONLY these criteria
-==================================================
+    ==================================================
+    QUESTION
+    ========
 
-1. Concept correctness
+    {json.dumps(question, indent=2)}
 
-2. Difficulty matches requested level
+    ==================================================
+    EVALUATION CRITERIA
+    ===================
 
-3. Clarity
+    Evaluate the question on the following:
 
-4. Brevity
+    1. Technical correctness
 
-5. Good distractors
+    * Is the concept accurate?
+    * Is the correct answer actually correct?
 
-6. Single correct answer
+    2. Difficulty alignment
 
-==================================================
-Scoring Guide
-==================================================
+    * Does the question match its intended difficulty?
 
-96-100
+    3. Clarity
 
-Outstanding classroom assessment.
+    * Is the wording easy to understand?
+    * Is there any ambiguity?
 
-91-94
+    4. Option quality
 
-Excellent.
+    * Are all options concise?
+    * Are they similar in style and length?
+    * Do they belong to the same category?
 
-82-89
+    5. Distractor quality
 
-Very Good.
+    * Are incorrect options believable?
+    * Are they technically valid but incorrect?
+    * Are any distractors obviously wrong?
 
-76-79
+    6. Single correct answer
 
-Good.
+    * Is there exactly one correct answer?
+    * Could another option reasonably be considered correct?
 
-71-74
+    7. Explanation quality
 
-Needs small improvement.
+    * Is the explanation technically correct?
+    * Does it justify the correct answer?
 
-61-69
+    ==================================================
+    SCORING
+    =======
 
-Weak.
+    Assign ONE overall score between 0 and 100.
 
-Below 60
+    General guidance:
 
-Reject.
+    96–100
+    Outstanding classroom-quality MCQ.
 
-DO NOT reduce score simply because
-the question is short.
+    91–95
+    Excellent with only minor improvements.
 
-Short questions are GOOD.
+    82–89
+    Good question with noticeable improvements possible.
 
-DO reduce score if:
+    71–79
+    Acceptable but requires revision.
 
-• wording is confusing
+    61–69
+    Weak question with significant issues.
 
-• options overlap
+    Below 60
+    Unsuitable for assessment.
 
-• multiple answers appear correct
+    Do NOT favor or penalize a question simply because it is short.
 
-• explanation is wrong
+    Reduce the score only when genuine quality issues exist.
 
-• difficulty is incorrect
+    ==================================================
+    IMPROVEMENTS
+    ============
 
-• question is unnecessarily long
+    List ONLY real problems.
 
-• business scenario is unnecessary
+    Do NOT invent improvements.
 
-==================================================
-Question
-==================================================
+    If the question is already excellent, return an empty improvements list.
 
-{json.dumps(question, indent=2)}
+    Do not suggest:
 
-==================================================
-Return ONLY JSON
-==================================================
+    * Business scenarios
+    * Enterprise examples
+    unless they are required to fix an actual flaw.
 
-{{
+    ==================================================
+    QUALITY CHECK
+    =============
+
+    Before returning your evaluation, silently verify:
+
+    • The score matches the actual quality.
+    • Strengths are supported by the question.
+    • Improvements describe real issues only.
+    • Do not contradict yourself.
+    • Do not praise and criticize the same aspect.
+
+    ==================================================
+    OUTPUT
+    ======
+
+    Return ONLY valid JSON.
+
+    {{
     "score": 0,
-    "strengths": [
-        ""
-    ],
-    "improvements": [
-        ""
-    ]
-}}
+    "strengths": [""],
+    "improvements": [""]
+    }}
 """
 
     response = client.chat.completions.create(
