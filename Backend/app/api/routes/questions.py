@@ -119,13 +119,10 @@ def generate_single_question(topic, difficulty, user_id):
             score=question.ai_score,
             iterations=question.refinement_iterations
         )
-
         db.commit()
-
         return question.id
 
     except Exception:
-
         db.rollback()
         raise
 
@@ -136,7 +133,6 @@ def generate_single_question(topic, difficulty, user_id):
 
 @router.post("/bulk-generate", response_model=BulkGenerateResponse)
 def bulk_generate(request: BulkGenerateRequest, current_user: User = Depends(get_current_user)):
-
     combinations = list(product(request.topics, request.difficulties))
     random.shuffle(combinations)
     tasks = []

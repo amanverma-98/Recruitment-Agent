@@ -114,16 +114,16 @@ def refine_question(question, improvements, reviewer_feedback):
         ============
 
         Easy
-        • Question ≤18 words
-        • Options ≤6 words
-
-        Medium
-        • Question ≤30 words
+        • Question ≤20 words
         • Options ≤9 words
 
-        Hard
-        • Question ≤45 words
+        Medium
+        • Question ≤35 words
         • Options ≤14 words
+
+        Hard
+        • Question ≤50 words
+        • Options ≤20 words
 
         ==================================================
         FINAL VALIDATION
