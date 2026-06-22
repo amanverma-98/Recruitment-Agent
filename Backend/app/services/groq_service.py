@@ -97,12 +97,14 @@ The question must:
 • be unique
 • Test exactly ONE concept.
 • Be technically correct.
+• ensure that correct option is matched if it is numerical.
 • Match the requested difficulty.
 • Be clear and concise.
 • Have exactly ONE correct answer.
 • Avoid ambiguity.
 • Avoid trick wording.
 • Be answerable without writing code.
+
 
 Never ask students to:
 
@@ -123,6 +125,7 @@ The options must:
 
 • Avoid unnecessary repeated words like explaining question in options contain only specific words.
 • Contain only the essential term or phrase.
+• Proper mathematical value if question is numerical
 • Belong to the same category.
 • Be similar in wording and length.
 • Be concise.
@@ -140,7 +143,7 @@ Never use:
 EXPLANATION
 =========================================================
 
-Write a short explanation (maximum three sentences).
+Write a short explanation (maximum three sentences), also focus more if it is numerical question.
 Explain only why the correct answer is correct.
 
 =========================================================
