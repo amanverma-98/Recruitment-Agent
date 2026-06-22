@@ -40,8 +40,7 @@ def run_question_workflow(topic, difficulty, question_id=None):
             "difficulty": difficulty,
             "refinement_iterations": 0,
             "strengths": [],
-            "improvements": [],
-            "review_feedback": []
+            "improvements": []
         },
         config={
             "configurable": {

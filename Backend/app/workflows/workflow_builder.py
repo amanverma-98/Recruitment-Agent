@@ -107,7 +107,7 @@ def evaluate_node(state: QuestionState):
 
 from app.agents.refiner import refine_question
 def refine_node(state: QuestionState):
-    refined = refine_question(state["question"],state["improvements"], state["review_feedback"])
+    refined = refine_question(state["question"],state["improvements"])
     return {
         "question": refined,
         "refinement_iterations":
