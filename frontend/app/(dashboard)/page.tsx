@@ -57,12 +57,23 @@ export default function DashboardPage() {
       </div>
 
       {/* Grid view 1: Four Main metrics counters */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <AnalyticsCard title="Total Questions" value={metrics?.total_questions ?? 0} />
-        <AnalyticsCard title="Approved" value={metrics?.approved ?? 0} />
-        <AnalyticsCard title="Pending Review" value={metrics?.pending ?? 0} />
-        <AnalyticsCard title="Rejected" value={metrics?.rejected ?? 0} isNegative />
-      </div>
+      {(() => {
+        // Compute average AI score: prefer backend value, fall back to client-side calc from logs
+        const avgAiScore = metrics?.avg_ai_score != null
+          ? metrics.avg_ai_score
+          : logs && logs.length > 0
+            ? Math.round((logs.reduce((sum, l) => sum + l.score, 0) / logs.length) * 10) / 10
+            : 0;
+
+        return (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <AnalyticsCard title="Total Questions" value={metrics?.total_questions ?? 0} />
+            <AnalyticsCard title="Approval Rate" value={metrics?.approved ?? 0} />
+            <AnalyticsCard title="Pending Review" value={metrics?.pending ?? 0} />
+            <AnalyticsCard title="Average AI Score" value={avgAiScore} suffix="%" />
+          </div>
+        );
+      })()}
 
       {/* Grid view 1.5: Analytics Charts — Status Distribution + Generation Velocity */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

@@ -18,7 +18,6 @@ interface Props {
 const COLORS = {
   approved: '#10b981',   // emerald-500
   pending: '#f59e0b',    // amber-500
-  rejected: '#f43f5e',   // rose-500
 };
 
 interface ChartEntry {
@@ -69,7 +68,6 @@ export default function StatusDistributionChart({ metrics }: Props) {
   const data: ChartEntry[] = [
     { name: 'Approved', value: metrics.approved, color: COLORS.approved },
     { name: 'Pending', value: metrics.pending, color: COLORS.pending },
-    { name: 'Rejected', value: metrics.rejected, color: COLORS.rejected },
   ];
 
   const total = metrics.approved + metrics.pending + metrics.rejected;
@@ -122,7 +120,7 @@ export default function StatusDistributionChart({ metrics }: Props) {
       </div>
 
       {/* Summary stats row */}
-      <div className="grid grid-cols-3 gap-3 pt-3 border-t border-gray-50 mt-2">
+      <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-50 mt-2">
         <div className="text-center">
           <p className="text-lg font-bold text-emerald-600">{metrics.approved}</p>
           <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Approved</p>
@@ -130,10 +128,6 @@ export default function StatusDistributionChart({ metrics }: Props) {
         <div className="text-center">
           <p className="text-lg font-bold text-amber-500">{metrics.pending}</p>
           <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Pending</p>
-        </div>
-        <div className="text-center">
-          <p className="text-lg font-bold text-rose-500">{metrics.rejected}</p>
-          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Rejected</p>
         </div>
       </div>
     </div>
