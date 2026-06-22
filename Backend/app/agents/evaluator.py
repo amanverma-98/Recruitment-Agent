@@ -25,6 +25,76 @@ Assume the students know only:
 • Basic DBMS
 • Basic Python
 • Basic C++
+
+==================================================
+Evaluate ONLY these criteria
+==================================================
+
+1. Concept correctness
+
+2. Difficulty matches requested level
+
+3. Clarity
+
+4. Brevity
+
+5. Good distractors
+
+6. Single correct answer
+
+==================================================
+Scoring Guide
+==================================================
+
+96-100
+
+Outstanding classroom assessment.
+
+91-94
+
+Excellent.
+
+82-89
+
+Very Good.
+
+76-79
+
+Good.
+
+71-74
+
+Needs small improvement.
+
+61-69
+
+Weak.
+
+Below 60
+
+Reject.
+
+DO NOT reduce score simply because
+the question is short.
+
+Short questions are GOOD.
+
+DO reduce score if:
+
+• wording is confusing
+
+• options overlap
+
+• multiple answers appear correct
+
+• explanation is wrong
+
+• difficulty is incorrect
+
+• question is unnecessarily long
+
+• business scenario is unnecessary
+
 ==================================================
 Question
 ==================================================
@@ -32,95 +102,18 @@ Question
 {json.dumps(question, indent=2)}
 
 ==================================================
-Evaluate the following independently
-==================================================
-
-Give an INTEGER score for EACH criterion.
-
-1. Concept Correctness (0-25)
-
-Does the question test a technically correct concept?
-
---------------------------------------------------
-
-2. Difficulty Alignment (0-15)
-
-Does the difficulty actually match Easy / Medium / Hard?
-
---------------------------------------------------
-
-3. Question Clarity (0-15)
-
-Is the wording easy to understand?
-
-Is there any ambiguity?
-
---------------------------------------------------
-
-4. Option Quality (0-15)
-
-Are all options concise?
-
-Are they grammatically consistent?
-
-Are they similar in style?
-
---------------------------------------------------
-
-5. Distractor Quality (0-15)
-
-Are incorrect options believable?
-
-Do they require thinking?
-
-Avoid obviously wrong options.
-
---------------------------------------------------
-
-6. Explanation Quality (0-10)
-
-Is the explanation correct?
-
-Is it concise?
-
---------------------------------------------------
-
-7. Conciseness (0-5)
-
-Is the question appropriately short for the requested difficulty?
-
-==================================================
-IMPORTANT
-==================================================
-
-DO NOT calculate the final score.
-
-Only score each criterion independently.
-
-The application will calculate the final score.
-
-==================================================
 Return ONLY JSON
 ==================================================
 
-{
-    "concept_correctness": 0,
-    "difficulty_alignment": 0,
-    "clarity": 0,
-    "option_quality": 0,
-    "distractor_quality": 0,
-    "explanation_quality": 0,
-    "conciseness": 0,
-
+{{
+    "score": 0,
     "strengths": [
         ""
     ],
-
     "improvements": [
         ""
     ]
-}
-
+}}
 """
 
     response = client.chat.completions.create(
@@ -142,16 +135,4 @@ Return ONLY JSON
         .strip()
     )
 
-    evaluation = json.loads(content)
-
-    evaluation["score"] = (
-        evaluation["concept_correctness"]
-        + evaluation["difficulty_alignment"]
-        + evaluation["clarity"]
-        + evaluation["option_quality"]
-        + evaluation["distractor_quality"]
-        + evaluation["explanation_quality"]
-        + evaluation["conciseness"]
-    )
-
-    return evaluation
+    return json.loads(content)
