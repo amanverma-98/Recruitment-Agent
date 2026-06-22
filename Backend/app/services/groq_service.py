@@ -49,6 +49,9 @@ Assume they know only:
 • Aptitude
 • Basic Javascript
 
+Never create questions based on assumptions, opinions, or undefined real-world statistics.
+Only generate questions whose correct answer can be derived from established concepts, formulas, or the information provided in the question.
+
 Generate questions suitable for:
 
 • University examinations
@@ -97,7 +100,6 @@ The question must:
 • be unique
 • Test exactly ONE concept.
 • Be technically correct.
-• ensure that correct option is matched if it is numerical.
 • Match the requested difficulty.
 • Be clear and concise.
 • Have exactly ONE correct answer.
@@ -125,7 +127,6 @@ The options must:
 
 • Avoid unnecessary repeated words like explaining question in options contain only specific words.
 • Contain only the essential term or phrase.
-• Proper mathematical value if question is numerical
 • Belong to the same category.
 • Be similar in wording and length.
 • Be concise.
@@ -159,6 +160,65 @@ Also, make sure that:
 • Options follow the same style.
 • The question matches the requested difficulty.
 • The explanation matches the correct answer.
+
+
+=========================================================
+SPECIAL RULES FOR APTITUDE, STATISTICS & PROBABILITY
+=========================================================
+
+If the topic belongs to Aptitude, Statistics, Probability, Quantitative Aptitude, or Numerical Reasoning:
+
+• Generate only mathematically valid questions.
+• Never invent formulas, statistical facts, or numerical values.
+• Internally solve the problem before writing the options.
+• Verify the computed answer twice before selecting the correct option.
+• Exactly one option must match the correct solution.
+• Every distractor must be mathematically incorrect but realistically believable.
+• Never create ambiguous numerical questions.
+• Never ask vague questions such as:
+  - "What percentage of people are above average?"
+  - "What is the average number of attempts needed..."
+  unless all required assumptions are explicitly provided.
+
+• If a numerical value is required, include all necessary information in the question.
+
+• Prefer questions involving:
+  - Mean
+  - Median
+  - Mode
+  - Range
+  - Variance
+  - Standard Deviation
+  - Probability of simple events
+  - Permutations
+  - Combinations
+  - Ratios
+  - Percentages
+  - Profit & Loss
+  - Time & Work
+  - Speed, Distance & Time
+  - Simple Interest
+  - Compound Interest
+  - Ages
+  - Mixtures
+  - Clocks
+  - Calendars
+  - Basic Logical Reasoning
+
+• Do NOT generate questions requiring advanced university-level mathematics.
+
+=========================================================
+SELF VERIFICATION
+=========================================================
+
+Before returning the JSON:
+
+1. Solve the question completely.
+2. Verify the correct option equals the computed answer.
+3. Verify the remaining three options are incorrect.
+4. Verify there is exactly one correct answer.
+5. If any calculation is uncertain, discard the question and generate a new one.
+6. Never guess numerical answers.
 
 
 =========================================================
