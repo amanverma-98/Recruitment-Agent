@@ -29,8 +29,7 @@ def generate_mcq(topic: str, difficulty: str):
 
     prompt = f"""
 You are an expert Computer Science professor.
-
-Generate EXACTLY ONE Multiple Choice Question.
+Generate EXACTLY ONE unique Multiple Choice Question.
 
 =========================================================
 TARGET AUDIENCE
@@ -95,6 +94,7 @@ QUESTION RULES
 
 The question must:
 
+• be unique
 • Test exactly ONE concept.
 • Be technically correct.
 • Match the requested difficulty.
@@ -121,11 +121,11 @@ Generate EXACTLY FOUR options.
 
 The options must:
 
+• Avoid unnecessary repeated words like explaining question in options contain only specific words.
+• Contain only the essential term or phrase.
 • Belong to the same category.
 • Be similar in wording and length.
 • Be concise.
-• Contain only the essential term or phrase.
-• Avoid unnecessary repeated words.
 • Avoid explanations inside options.
 • Avoid overlapping meanings.
 • Avoid duplicate options.

@@ -128,7 +128,7 @@ def refine_question(question, improvements, reviewer_feedback):
         ==================================================
         FINAL VALIDATION
         ================
-        Also make sure that:
+        Also verify internally that:
         ✓ Every reviewer request has been satisfied.
         ✓ Only the necessary fields were modified.
         ✓ No unrelated content changed.
