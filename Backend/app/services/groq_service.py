@@ -82,9 +82,9 @@ EASY
 • One concept only
 • Direct question
 • No scenario
-• Maximum 18 words
-• Options: 2-6 words each
-• Explanation under 30 words
+• Maximum 24 words
+• Options: 4-9 words each
+• Explanation under 50 words
 
 Examples:
 
@@ -97,22 +97,23 @@ MEDIUM
 ---------------------------------------------------------
 
 • Small scenario allowed
-• Maximum 30 words
+• Moderate complexity
+• Maximum 50 words
 • Tests understanding
-• Options 3-8 words
-• Explanation under 35 words
+• Options 5-12 words
+• Explanation under 55 words
 
 ---------------------------------------------------------
 HARD
 ---------------------------------------------------------
 
 • Small practical scenario
-• Maximum 45 words
+• Slightly complex question
+• Maximum 80 words
 • Requires reasoning
 • NOT enterprise level
-• NOT advanced optimization
-• Options 4-10 words
-• Explanation under 40 words
+• Options 8-18 words
+• Explanation under 70 words
 
 =========================================================
 STRICTLY FORBIDDEN
@@ -166,8 +167,6 @@ QUESTION QUALITY
 =========================================================
 
 The question must:
-
-• Be short
 
 • Be clear
 
