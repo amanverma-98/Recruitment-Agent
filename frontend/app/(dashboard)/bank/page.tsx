@@ -9,9 +9,10 @@ import BankControls from '@/features/bank/components/bank-controls';
 
 export default function QuestionBankPage() {
   const router = useRouter();
-  const [filters, setFilters] = useState({ search: '', topic: '' });
+  const [filters, setFilters] = useState({ search: '', topic: '', difficulty: '' });
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
   
   const { data: questions, isLoading, isError } = useQuestionBank(filters);
   const { mutate: deleteQuestion, isPending: isDeleting } = useDeleteQuestions();
@@ -41,18 +42,32 @@ export default function QuestionBankPage() {
     });
   };
 
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+    deleteQuestion(selectedIds, {
+      onSuccess: () => {
+        setBulkDeleteConfirm(false);
+        setSelectedIds([]);
+      },
+    });
+  };
+
   return (
     <div className="space-y-6 pt-7 px-5">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Question Bank</h1>
-        <p className="text-sm text-gray-500 mt-1">Browse and manage all approved questions.</p>
+        <p className="text-sm text-gray-500 mt-1">Browse and manage all questions.</p>
       </div>
 
       {/* Dynamic Controls Filter & Dropdown Export Config Panel */}
       <BankControls 
         selectedIds={selectedIds}
+        selectedCount={selectedIds.length}
         onSearchChange={(val) => setFilters(prev => ({ ...prev, search: val }))}
         onTopicChange={(val) => setFilters(prev => ({ ...prev, topic: val }))}
+        onDifficultyChange={(val)=> setFilters(prev => ({ ...prev, difficulty:val }))}
+        onCancelSelection={() => setSelectedIds([])}
+        onBulkDelete={() => setBulkDeleteConfirm(true)}
       />
 
       {/* Data Table Primitive Layer Component */}
@@ -82,13 +97,15 @@ export default function QuestionBankPage() {
                   <th className="p-4">Topic</th>
                   <th className="p-4">Difficulty</th>
                   <th className="p-4">Score</th>
+                  <th className="p-4 text-center">Status</th>
                   <th className="p-4 text-center">Actions</th>
+                  
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 font-medium text-gray-700">
                 {questions && questions.length > 0 ? (
                   questions.map((q) => (
-                    <tr key={q.id} className="hover:bg-gray-50/40 transition-colors">
+                    <tr key={q.id} className={`hover:bg-gray-50/40 transition-colors ${selectedIds.includes(q.id) ? 'bg-purple-50/30' : ''}`}>
                       <td className="p-4 text-center">
                         <input 
                           type="checkbox" 
@@ -111,6 +128,13 @@ export default function QuestionBankPage() {
                         </span>
                       </td>
                       <td className="p-4 font-bold text-gray-900">{q.ai_score ?? '—'}</td>
+                      <td className="p-4 text-center">
+                        <span className={`font-semibold ${
+                          q.status === 'approved' ? 'text-green-600' : q.status === 'improved' ? 'text-amber-600' : 'text-red-600'
+                        }`}>
+                          {q.status}
+                        </span>
+                      </td>
                       <td className="p-4 text-center">
                         <div className="flex items-center justify-center gap-1">
                           {/* Eye icon — navigate to question detail page */}
@@ -136,7 +160,7 @@ export default function QuestionBankPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6} className="p-8 text-center text-gray-400 font-medium">
+                    <td colSpan={7} className="p-8 text-center text-gray-400 font-medium">
                       No approved questions found matching the filters.
                     </td>
                   </tr>
@@ -147,7 +171,7 @@ export default function QuestionBankPage() {
         )}
       </div>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Single Delete Confirmation Dialog */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl p-6 shadow-2xl max-w-sm w-full mx-4 animate-in zoom-in-95 duration-200">
@@ -178,6 +202,44 @@ export default function QuestionBankPage() {
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   'Delete'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Confirmation Dialog */}
+      {bulkDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-6 shadow-2xl max-w-sm w-full mx-4 animate-in zoom-in-95 duration-200">
+            <div className="text-center">
+              <div className="w-12 h-12 mx-auto mb-4 bg-rose-50 rounded-full flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-rose-500" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Delete {selectedIds.length} Question{selectedIds.length > 1 ? 's' : ''}</h3>
+              <p className="text-sm text-gray-500 mt-2">
+                Are you sure you want to delete <span className="font-bold text-rose-600">{selectedIds.length}</span> selected question{selectedIds.length > 1 ? 's' : ''}? This action cannot be undone.
+              </p>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setBulkDeleteConfirm(false)}
+                disabled={isDeleting}
+                className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl text-sm transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                disabled={isDeleting}
+                className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+              >
+                {isDeleting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  `Delete ${selectedIds.length} Question${selectedIds.length > 1 ? 's' : ''}`
                 )}
               </button>
             </div>

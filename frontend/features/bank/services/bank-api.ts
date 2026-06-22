@@ -12,7 +12,7 @@ export type Question = QuestionResponse;
  * Fetch all approved questions from the centralized API.
  */
 export const getApprovedQuestions = async (): Promise<Question[]> => {
-  return getQuestions('approved');
+  return getQuestions(status="");
 };
 
 /**

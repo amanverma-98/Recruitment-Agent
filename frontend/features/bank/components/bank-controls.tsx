@@ -1,16 +1,20 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FileDown, ChevronDown, Loader2, X, FileText } from 'lucide-react';
+import { FileDown, ChevronDown, Loader2, X, FileText, Trash2, AlertTriangle } from 'lucide-react';
 import { useExportPdf, useExportDocx, useExportQuesWithoutDetailPdf, useExportQuesWithoutDetailDocx } from '../hooks/use-bank';
 
 interface ControlsProps {
   selectedIds: string[];
+  selectedCount: number;
   onSearchChange: (val: string) => void;
   onTopicChange: (val: string) => void;
+  onDifficultyChange:(val: string) => void;
+  onCancelSelection: () => void;
+  onBulkDelete: () => void;
 }
 
-export default function BankControls({ selectedIds, onSearchChange, onTopicChange }: ControlsProps) {
+export default function BankControls({ selectedIds, selectedCount, onSearchChange, onTopicChange, onDifficultyChange, onCancelSelection, onBulkDelete }: ControlsProps) {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showParamMenu, setShowParamMenu] = useState(false);
   
@@ -52,10 +56,52 @@ export default function BankControls({ selectedIds, onSearchChange, onTopicChang
     setShowExportMenu(false);
   };
 
+  // ─── Bulk Actions Toolbar (shown when rows are selected) ───
+  if (selectedCount > 0) {
+    return (
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-gradient-to-r from-rose-50/80 via-white to-white p-4 rounded-xl border border-rose-200/60 shadow-sm transition-all duration-300 animate-in fade-in slide-in-from-top-2">
+        {/* Left: selection info */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-rose-100 text-rose-600">
+            <AlertTriangle className="w-4 h-4" />
+          </div>
+          <div>
+            <span className="text-sm font-bold text-gray-900">
+              {selectedCount} question{selectedCount > 1 ? 's' : ''} selected
+            </span>
+            <p className="text-[10px] text-gray-400 font-medium">Select an action below or cancel to deselect all</p>
+          </div>
+        </div>
+
+        {/* Right: action buttons */}
+        <div className="flex items-center gap-2 self-end sm:self-auto">
+          {/* Cancel selection */}
+          <button
+            onClick={onCancelSelection}
+            className="px-3.5 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 font-semibold rounded-xl text-xs flex items-center gap-1.5 transition-all shadow-sm"
+          >
+            <X className="w-3.5 h-3.5" />
+            <span>Cancel</span>
+          </button>
+
+          {/* Delete Selected */}
+          <button
+            onClick={onBulkDelete}
+            className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-sm shadow-rose-200 hover:shadow-rose-300"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Delete Selected ({selectedCount})</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Standard Filters & Search Bar (shown when nothing is selected) ───
   return (
     <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
       {/* Search & Filters */}
-      <div className="flex flex-1 gap-3 w-full sm:w-auto">
+      <div className="flex text-black flex-1 gap-3 w-full sm:w-auto">
         <input 
           type="text" 
           placeholder="Search questions..." 
@@ -76,6 +122,15 @@ export default function BankControls({ selectedIds, onSearchChange, onTopicChang
           <option value="Statistics">Statistics</option>
           <option value="Probability">Probability</option>
           <option value="Aptitude">Aptitude</option>
+        </select>
+        <select 
+          onChange={(e) => onDifficultyChange(e.target.value)}
+          className="px-3 py-2 border border-gray-200 rounded-xl text-xs bg-white text-gray-600 font-medium"
+        >
+          <option value="">All Difficulties</option>
+          <option value="easy">EASY</option>
+          <option value="medium">MEDIUM</option>
+          <option value="hard">HARD</option>
         </select>
       </div>
 

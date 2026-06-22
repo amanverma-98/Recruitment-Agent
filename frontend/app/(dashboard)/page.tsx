@@ -6,6 +6,8 @@ import { Calendar, Plus, ArrowRight, Loader2, Database, CheckCircle2, AlertCircl
 import { useDashboardAnalytics, useActivityLogs } from '@/features/dashboard/hooks/use-dashboard-data';
 import AnalyticsCard from '@/features/dashboard/components/analytics-card';
 import AgentStatusList from '@/features/dashboard/components/agent-status-list';
+import StatusDistributionChart from '@/features/dashboard/components/status-distribution-chart';
+import GenerationVelocityChart from '@/features/dashboard/components/generation-velocity-chart';
 
 export default function DashboardPage() {
   const { data: metrics, isLoading, isError } = useDashboardAnalytics();
@@ -60,6 +62,31 @@ export default function DashboardPage() {
         <AnalyticsCard title="Approved" value={metrics?.approved ?? 0} />
         <AnalyticsCard title="Pending Review" value={metrics?.pending ?? 0} />
         <AnalyticsCard title="Rejected" value={metrics?.rejected ?? 0} isNegative />
+      </div>
+
+      {/* Grid view 1.5: Analytics Charts — Status Distribution + Generation Velocity */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Donut Chart */}
+        <div className="lg:col-span-5">
+          {metrics ? (
+            <StatusDistributionChart metrics={metrics} />
+          ) : (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 h-[340px] flex items-center justify-center">
+              <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
+            </div>
+          )}
+        </div>
+
+        {/* Line / Area Chart */}
+        <div className="lg:col-span-7">
+          {logsLoading ? (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 h-[340px] flex items-center justify-center">
+              <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
+            </div>
+          ) : (
+            <GenerationVelocityChart logs={logs ?? []} />
+          )}
+        </div>
       </div>
 
       {/* Grid view 2: NEW Pipeline Status Monitor Table paired with side status */}
