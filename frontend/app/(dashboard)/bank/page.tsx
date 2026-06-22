@@ -9,11 +9,11 @@ import BankControls from '@/features/bank/components/bank-controls';
 
 export default function QuestionBankPage() {
   const router = useRouter();
-  const [filters, setFilters] = useState({ search: '', topic: '', difficulty: '' });
+  const [filters, setFilters] = useState({ search: '', topic: '', difficulty: '',status:'' });
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
-  
+
   const { data: questions, isLoading, isError } = useQuestionBank(filters);
   const { mutate: deleteQuestion, isPending: isDeleting } = useDeleteQuestions();
 
@@ -66,6 +66,7 @@ export default function QuestionBankPage() {
         onSearchChange={(val) => setFilters(prev => ({ ...prev, search: val }))}
         onTopicChange={(val) => setFilters(prev => ({ ...prev, topic: val }))}
         onDifficultyChange={(val)=> setFilters(prev => ({ ...prev, difficulty:val }))}
+        onStatusChange={(val)=> setFilters(prev => ({ ...prev, status:val }))}
         onCancelSelection={() => setSelectedIds([])}
         onBulkDelete={() => setBulkDeleteConfirm(true)}
       />

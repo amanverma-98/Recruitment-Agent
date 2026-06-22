@@ -10,7 +10,7 @@ import { useToast } from '@/lib/hooks/use-toast';
  * The backend's GET /questions/ only supports `status` as a query param,
  * so topic and search filtering happens here in-memory.
  */
-export const useQuestionBank = (filters: { topic?: string; search?: string , difficulty?:string }) => {
+export const useQuestionBank = (filters: { topic?: string; search?: string , difficulty?:string ,status?:string}) => {
   const query = useQuery({
     queryKey: ['questions', 'bank'],
     queryFn: getApprovedQuestions,
@@ -24,6 +24,10 @@ export const useQuestionBank = (filters: { topic?: string; search?: string , dif
     // Client-side topic filter
     if (filters.topic) {
       result = result.filter(q => q.topic.toLowerCase() === filters.topic!.toLowerCase());
+    }
+
+    if(filters.status){
+      result = result.filter(q => q.status.toLowerCase() === filters.status!.toLowerCase())
     }
 
     if(filters.difficulty)
@@ -41,7 +45,7 @@ export const useQuestionBank = (filters: { topic?: string; search?: string , dif
     }
 
     return result;
-  }, [query.data, filters.topic, filters.search , filters.difficulty]);
+  }, [query.data, filters.topic, filters.search , filters.difficulty , filters.status]);
 
   return {
     ...query,

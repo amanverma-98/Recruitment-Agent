@@ -10,11 +10,12 @@ interface ControlsProps {
   onSearchChange: (val: string) => void;
   onTopicChange: (val: string) => void;
   onDifficultyChange:(val: string) => void;
+  onStatusChange:(val:string)=>void;
   onCancelSelection: () => void;
   onBulkDelete: () => void;
 }
 
-export default function BankControls({ selectedIds, selectedCount, onSearchChange, onTopicChange, onDifficultyChange, onCancelSelection, onBulkDelete }: ControlsProps) {
+export default function BankControls({ selectedIds, selectedCount, onSearchChange, onTopicChange, onDifficultyChange,onStatusChange, onCancelSelection, onBulkDelete }: ControlsProps) {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showParamMenu, setShowParamMenu] = useState(false);
   
@@ -101,7 +102,7 @@ export default function BankControls({ selectedIds, selectedCount, onSearchChang
   return (
     <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
       {/* Search & Filters */}
-      <div className="flex text-black flex-1 gap-3 w-full sm:w-auto">
+      <div className="flex text-black flex-1 flex-wrap gap-3 w-full sm:w-auto">
         <input 
           type="text" 
           placeholder="Search questions..." 
@@ -132,11 +133,20 @@ export default function BankControls({ selectedIds, selectedCount, onSearchChang
           <option value="medium">MEDIUM</option>
           <option value="hard">HARD</option>
         </select>
+        <select 
+          onChange={(e) => onStatusChange(e.target.value)}
+          className="px-3 py-2 border border-gray-200 rounded-xl text-xs bg-white text-gray-600 font-medium"
+        >
+          <option value="">All</option>
+          <option value="approved">APPROVED</option>
+          <option value="rejected">REJECTED</option>
+          <option value="pending_review">PENDING</option>
+        </select>
       </div>
 
       {/* Export Action Controls */}
       <div className="relative self-end sm:self-auto">
-        <div className='flex gap-2'>
+        <div className='flex flex-wrap gap-2'>
           <button
             onClick={() => setShowParamMenu(true)}
             className="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-sm"

@@ -26,6 +26,19 @@ export default function ReviewQueuePage() {
     setTimeout(() => feedbackInputRef.current?.focus(), 100);
   };
 
+  const handleReject = ()=>{
+    if(!selectedQuestion) return ;
+    const feedback = feedbackText.trim()
+    reviewMutate(
+      { id: selectedQuestion.id, action: 'reject', feedback },
+      {
+        onSuccess: (updatedQuestion) => {
+          setSelectedQuestion(updatedQuestion);
+        },
+      },
+    );
+  }
+
   const submitImprove = () => {
     if (!selectedQuestion) return;
     const feedback = feedbackText.trim() || 'Please improve the quality and clarity of this question.';
@@ -40,7 +53,6 @@ export default function ReviewQueuePage() {
     );
   };
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
-console.log(questions)
   // Sync selection defaults when items payload refreshes successfully
   useEffect(() => {
     if (questions && questions.length > 0) {
@@ -154,7 +166,7 @@ console.log(questions)
                 </button>
                 <button
                   disabled={isUpdating}
-                  onClick={() => updateStatus({ id: selectedQuestion.id, status: 'rejected' })}
+                  onClick={handleReject}
                   className="py-3.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm shadow-rose-600/10 w-full"
                 >
                   <Trash2 className="w-4 h-4 stroke-[2.5]" /> Reject

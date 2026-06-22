@@ -36,7 +36,7 @@ export const useReviewQuestion = () => {
   const { showToast } = useToast();
 
   return useMutation({
-    mutationFn: ({ id, action, feedback }: { id: string; action: 'improve'; feedback?: string }) =>
+    mutationFn: ({ id, action, feedback }: { id: string; action: 'improve' | 'reject'; feedback?: string }) =>
       reviewQuestion(id, action, feedback),
     onSuccess: (updatedQuestion) => {
       showToast('Question review processed successfully.', 'success');
