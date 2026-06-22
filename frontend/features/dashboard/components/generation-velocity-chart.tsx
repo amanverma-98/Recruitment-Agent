@@ -42,7 +42,7 @@ export default function GenerationVelocityChart({ logs }: Props) {
     const dayMap = new Map<string, number>();
 
     // Pre-fill last 14 days with zeroes
-    for (let i = 13; i >= 0; i--) {
+    for (let i = 6; i >= 0; i--) {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
       const key = d.toISOString().slice(0, 10); // YYYY-MM-DD
