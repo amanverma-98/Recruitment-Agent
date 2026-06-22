@@ -8,10 +8,19 @@ import EvaluationMetrics from '@/features/review/components/evalutaion-metrics';
 import { Question } from '@/features/review/services/review-api';
 
 export default function ReviewQueuePage() {
-  const { data: questions, isLoading, isError } = usePendingQuestions();
+  const { data: questions, isLoading, isError, refetch } = usePendingQuestions();
   const { mutate: updateStatus, isPending: isStatusUpdating } = useUpdateStatus();
   const { mutate: reviewMutate, isPending: isReviewUpdating } = useReviewQuestion();
   const isUpdating = isStatusUpdating || isReviewUpdating;
+
+  // One-time refetch after 5 seconds of page open
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      refetch();
+    }, 5000);
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Feedback modal state
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
