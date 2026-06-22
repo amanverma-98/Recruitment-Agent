@@ -37,7 +37,7 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 
 export default function GenerationVelocityChart({ logs }: Props) {
   const chartData = useMemo(() => {
-    // Build a map of last 14 days with counts
+    // Build a map of last 7 days with counts
     const now = new Date();
     const dayMap = new Map<string, number>();
 
@@ -80,10 +80,10 @@ export default function GenerationVelocityChart({ logs }: Props) {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 h-full flex flex-col">
         <div className="mb-4">
           <h3 className="text-sm font-bold text-gray-900">Generation Velocity</h3>
-          <p className="text-xs text-gray-400 mt-0.5">Questions generated over the last 14 days</p>
+          <p className="text-xs text-gray-400 mt-0.5">Questions generated over the last 7 days</p>
         </div>
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-xs font-semibold text-gray-400">No generation activity in the past 14 days.</p>
+          <p className="text-xs font-semibold text-gray-400">No generation activity in the past 7 days.</p>
         </div>
       </div>
     );
@@ -95,7 +95,7 @@ export default function GenerationVelocityChart({ logs }: Props) {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-bold text-gray-900">Generation Velocity</h3>
-            <p className="text-xs text-gray-400 mt-0.5">Questions generated over the last 14 days</p>
+            <p className="text-xs text-gray-400 mt-0.5">Questions generated over the last 7 days</p>
           </div>
           <span className="text-xs bg-purple-50 text-purple-700 px-2.5 py-1 rounded-full font-bold">
             Trend

@@ -3,6 +3,7 @@
 import React from "react";
 import { useGenerationStore } from "@/store/use-generation-store";
 import { useBulkGenerate } from "../hooks/use-generate";
+import { useToast } from "@/lib/hooks/use-toast";
 import { Sparkles, Loader2, Check } from "lucide-react";
 
 const TOPICS = [
@@ -21,6 +22,7 @@ const DIFFICULTIES = ["Easy", "Medium", "Hard"];
 export default function ConfigForm() {
   const store = useGenerationStore();
   const { mutate, isPending } = useBulkGenerate();
+  const { showToast } = useToast();
 
   const handleGenerate = () => {
     if (store.topics.length === 0 || store.difficulties.length === 0) return;
@@ -130,11 +132,17 @@ export default function ConfigForm() {
               <input
                 type="number"
                 min={0}
-                max={50}
+                max={15}
                 value={store.questionsPerTopic}
-                onChange={(e) =>
-                  store.setQuestionsPerTopic(Number(e.target.value))
-                }
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  if (value > 15) {
+                    showToast("Not more than 15 questions can be generated at a time", "error");
+                    store.setQuestionsPerTopic(15);
+                    return;
+                  }
+                  store.setQuestionsPerTopic(value);
+                }}
                 className="w-full text-black px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all pr-12 font-medium"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-gray-400 uppercase">

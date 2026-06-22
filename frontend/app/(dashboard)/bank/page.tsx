@@ -131,7 +131,7 @@ export default function QuestionBankPage() {
                       <td className="p-4 font-bold text-gray-900">{q.ai_score ?? '—'}</td>
                       <td className="p-4 text-center">
                         <span className={`font-semibold ${
-                          q.status === 'approved' ? 'text-green-600' : q.status === 'improved' ? 'text-amber-600' : 'text-red-600'
+                          q.status === 'approved' ? 'text-green-600' : 'text-amber-600'
                         }`}>
                           {q.status}
                         </span>
