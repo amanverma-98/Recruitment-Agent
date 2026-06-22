@@ -141,7 +141,6 @@ EXPLANATION
 =========================================================
 
 Write a short explanation (maximum three sentences).
-
 Explain only why the correct answer is correct.
 
 =========================================================

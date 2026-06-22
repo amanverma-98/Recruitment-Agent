@@ -1,9 +1,6 @@
 import json
-
 from groq import Groq
-
 from app.core.config import settings
-
 client = Groq(api_key=settings.GROQ_API_KEY)
 
 
@@ -11,7 +8,6 @@ def refine_question(question, improvements, reviewer_feedback):
 
     prompt = f"""
         You are an experienced Computer Science professor.
-
         Your task is to improve an existing multiple-choice question.
         You are **NOT** generating a new question.
         You are **NOT** redesigning the assessment.
@@ -105,8 +101,7 @@ def refine_question(question, improvements, reviewer_feedback):
         QUESTION QUALITY
         ================
 
-        After applying the requested changes ensure:
-
+        Also ensure that:
         • Exactly ONE concept is tested.
         • Exactly FOUR options exist.
         • Exactly ONE option is correct.
@@ -124,11 +119,11 @@ def refine_question(question, improvements, reviewer_feedback):
 
         Medium
         • Question ≤30 words
-        • Options ≤10 words
+        • Options ≤9 words
 
         Hard
         • Question ≤45 words
-        • Options ≤15 words
+        • Options ≤14 words
 
         ==================================================
         FINAL VALIDATION

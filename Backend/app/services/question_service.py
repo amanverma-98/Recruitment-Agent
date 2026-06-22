@@ -56,23 +56,23 @@ def create_question(db: Session, payload, user_id):
     )
 
     if difficulty == "easy":
-        if question_words > 18:
+        if question_words > 22:
             raise ValueError("Easy question too long")
-        if longest_option > 6:
+        if longest_option > 7:
             raise ValueError("Easy options too long")
     elif difficulty == "medium":
-        if question_words > 30:
+        if question_words > 35:
             raise ValueError("Medium question too long")
         if longest_option > 10:
             raise ValueError("Medium options too long")
     elif difficulty == "hard":
-        if question_words > 45:
+        if question_words > 55:
             raise ValueError("Hard question too long")
         if longest_option > 15:
             raise ValueError("Hard options too long")
-    if explanation_words > 40:
+    if explanation_words > 70:
         raise ValueError("Explanation too long")
-    if payload.ai_score < 60:
+    if payload.ai_score < 55:
         raise ValueError(
             f"Question quality too low ({payload.ai_score})"
         )
