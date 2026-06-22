@@ -36,11 +36,8 @@ class UpdateStatusRequest(BaseModel):
 
 
 class BulkGenerateRequest(BaseModel):
-
     topics: list[str]
-
     difficulties: list[str]
-
     count: int 
 
 class BulkGenerateResponse(BaseModel):
@@ -58,22 +55,14 @@ class ReviewRequest(BaseModel):
 class CreateQuestionPayload(BaseModel):
     topic: str
     difficulty: str
-
     question: str = Field(min_length=10)
-
     options: List[str] = Field(min_length=4, max_length=4)
-
     correct_option: int = Field(ge=0, le=3)
-
     explanation: str
-
     ai_score: int = Field(ge=0, le=100)
-
     strengths: List[str]
     evaluation_feedback: List[str]
-
     refinement_iterations: int = Field(ge=0) 
-
     status: str = "pending_review"
     workflow_id: Optional[str] = None
 

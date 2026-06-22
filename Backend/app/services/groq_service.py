@@ -148,7 +148,7 @@ Explain only why the correct answer is correct.
 QUALITY CHECK
 =========================================================
 
-Before producing the final answer, silently verify that:
+Also, make sure that:
 
 • The concept is technically correct.
 • Only one option is correct.
@@ -158,7 +158,6 @@ Before producing the final answer, silently verify that:
 • The question matches the requested difficulty.
 • The explanation matches the correct answer.
 
-If any check fails, internally improve the question before returning the final result.
 
 =========================================================
 OUTPUT
@@ -203,7 +202,6 @@ Return ONLY valid JSON.
     print("=" * 80)
 
     data = json.loads(content)
-
     validated = MCQSchema.model_validate(data)
 
     return validated.model_dump()

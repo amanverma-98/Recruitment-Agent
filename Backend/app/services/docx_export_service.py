@@ -2,12 +2,7 @@ from io import BytesIO
 from docx import Document
 
 
-def generate_docx(questions,
-
-    include_answers=False,
-
-    include_explanations=False):
-
+def generate_docx(questions, include_answers=False, include_explanations=False):
     document = Document()
 
     document.add_heading("Question Bank",level=1)

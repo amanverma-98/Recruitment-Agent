@@ -23,16 +23,9 @@ def generate_question(
     question = None
 
     try:
-
         for _ in range(3):
-
             try:
-
-                generated = run_question_workflow(
-                    topic=request.topic,
-                    difficulty=request.difficulty
-                )
-
+                generated = run_question_workflow(topic=request.topic, difficulty=request.difficulty)
                 payload = {
                     "topic": generated["topic"],
                     "difficulty": generated["difficulty"],
@@ -46,24 +39,12 @@ def generate_question(
                     "refinement_iterations": generated["refinement_iterations"],
                     "workflow_id": generated["workflow_id"]
                 }
-
-                question = create_question(
-                    db=db,
-                    payload=payload,
-                    user_id=current_user.id
-                )
-
+                question = create_question(db=db, payload=payload, user_id=current_user.id)
                 break
 
             except ValueError as e:
-
-                if (
-                    "Duplicate question" in str(e)
-                    or
-                    "Invalid generated question" in str(e)
-                ):
+                if ("Duplicate question" in str(e) or "Invalid generated question" in str(e)):
                     continue
-
                 raise
 
         if question is None:
@@ -94,29 +75,16 @@ def generate_question(
 from concurrent.futures import ThreadPoolExecutor
 from itertools import product
 import random
-
 from app.core.database import SessionLocal
 
-def generate_single_question(
-    topic,
-    difficulty,
-    user_id
-):
+def generate_single_question(topic, difficulty, user_id):
     db: Session = SessionLocal()
 
     try:
-
         question = None
-
         for _ in range(3):
-
             try:
-
-                generated = run_question_workflow(
-                    topic=topic,
-                    difficulty=difficulty
-                )
-
+                generated = run_question_workflow(topic=topic, difficulty=difficulty)
                 payload = {
                     "topic": generated["topic"],
                     "difficulty": generated["difficulty"],
@@ -131,23 +99,12 @@ def generate_single_question(
                     "workflow_id": generated["workflow_id"]
                 }
 
-                question = create_question(
-                    db=db,
-                    payload=payload,
-                    user_id=user_id
-                )
-
+                question = create_question(db=db, payload=payload, user_id=user_id)
                 break
 
             except ValueError as e:
-
-                if (
-                    "Duplicate question" in str(e)
-                    or
-                    "Invalid generated question" in str(e)
-                ):
+                if ("Duplicate question" in str(e) or "Invalid generated question" in str(e)):
                     continue
-
                 raise
 
         if question is None:
@@ -178,33 +135,17 @@ def generate_single_question(
 
 
 @router.post("/bulk-generate", response_model=BulkGenerateResponse)
-def bulk_generate(
-    request: BulkGenerateRequest,
-    current_user: User = Depends(get_current_user)
-):
+def bulk_generate(request: BulkGenerateRequest, current_user: User = Depends(get_current_user)):
 
-    combinations = list(
-        product(
-            request.topics,
-            request.difficulties
-        )
-    )
-
+    combinations = list(product(request.topics, request.difficulties))
     random.shuffle(combinations)
-
     tasks = []
-
     for i in range(request.count):
-
-        tasks.append(
-            combinations[i % len(combinations)]
-        )
+        tasks.append(combinations[i % len(combinations)])
 
     generated_questions = []
     failed = 0
-
     with ThreadPoolExecutor(max_workers=2) as executor:
-
         futures = [
             executor.submit(
                 generate_single_question,
@@ -216,21 +157,13 @@ def bulk_generate(
         ]
 
         for future in futures:
-
             try:
-
-                generated_questions.append(
-                    future.result()
-                )
-
+                generated_questions.append(future.result())
             except Exception as e:
-
                 print(e)
-
                 failed += 1
 
     if not generated_questions:
-
         raise HTTPException(
             status_code=500,
             detail="Failed to generate questions"
@@ -244,12 +177,9 @@ def bulk_generate(
 
 
 from app.models.question import Question
-
 @router.get("/", response_model=list[QuestionResponse])
 def get_questions(status: str | None = None, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    query = db.query(Question).filter(
-    Question.user_id == current_user.id
-    )
+    query = db.query(Question).filter(Question.user_id == current_user.id)
     if status:
         query = query.filter(Question.status == status)
     return query.all()
@@ -257,14 +187,7 @@ def get_questions(status: str | None = None, db: Session = Depends(get_db), curr
 
 @router.get("/{question_id}", response_model=QuestionResponse)
 def get_question(question_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    question = (
-    db.query(Question)
-    .filter(
-        Question.id == question_id,
-        Question.user_id == current_user.id
-    )
-    .first()
-)
+    question = (db.query(Question).filter(Question.id == question_id, Question.user_id == current_user.id).first())
     if not question:
         raise HTTPException(status_code=404, detail="Question not found")
     return question
@@ -273,17 +196,9 @@ def get_question(question_id: str, db: Session = Depends(get_db), current_user: 
 
 
 from app.schemas.question import (UpdateStatusRequest)
-
 @router.patch("/{question_id}/status", response_model=QuestionResponse)
 def update_status(question_id: str, request: UpdateStatusRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    question = (
-    db.query(Question)
-    .filter(
-        Question.id == question_id,
-        Question.user_id == current_user.id
-    )
-    .first()
-)
+    question = (db.query(Question).filter(Question.id == question_id, Question.user_id == current_user.id).first())
     if not question:
         raise HTTPException(
             status_code=404,
@@ -300,26 +215,15 @@ from app.schemas.question import ReviewRequest
 from app.workflows.improvement_workflow import run_improvement_workflow
 @router.patch("/{question_id}/review")
 def review_question(question_id: str,request: ReviewRequest,db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    question = (
-    db.query(Question)
-    .filter(
-        Question.id == question_id,
-        Question.user_id == current_user.id
-    )
-    .first()
-)
-
+    question = (db.query(Question).filter(Question.id == question_id, Question.user_id == current_user.id).first())
     if not question:
         raise HTTPException(status_code=404,detail="Question not found")
     if request.action == "approve":
         question.status = "approved"
 
     elif request.action == "reject":
-
         db.delete(question)
-
         db.commit()
-
         return {
             "message": "Question rejected and deleted successfully"
         }
@@ -330,7 +234,6 @@ def review_question(question_id: str,request: ReviewRequest,db: Session = Depend
                 status_code=400,
                 detail="Feedback is required for improve action"
             )
-        
         if not question.workflow_id:
             raise HTTPException(
                 status_code=400,
@@ -345,11 +248,7 @@ def review_question(question_id: str,request: ReviewRequest,db: Session = Depend
                 "explanation": question.explanation,
             }
 
-            result = run_improvement_workflow(
-                payload,
-                question.evaluator_feedback,
-                request.feedback
-            )
+            result = run_improvement_workflow(payload, question.evaluator_feedback, request.feedback)
             
             print(result)
 
@@ -357,18 +256,15 @@ def review_question(question_id: str,request: ReviewRequest,db: Session = Depend
             question.options = result["options"]
             question.correct_option = result["correct_option"]
             question.explanation = result["explanation"]
-
             question.ai_score = result["ai_score"]
             question.strengths = result["strengths"]
             question.evaluation_feedback = result["evaluation_feedback"]
-
             question.refinement_iterations += 1
             question.status = "pending_review"
             question.review_feedback = request.feedback
 
             from datetime import datetime, timezone
             question.reviewed_at = datetime.now(timezone.utc)
-
             db.commit()
             db.refresh(question)
 
@@ -387,17 +283,9 @@ def review_question(question_id: str,request: ReviewRequest,db: Session = Depend
 from fastapi.responses import StreamingResponse
 from app.schemas.export import ExportRequest
 from app.services.export_service import (generate_questions_pdf)
-
 @router.post("/export/pdf")
 def export_pdf(request: ExportRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    questions = (
-    db.query(Question)
-    .filter(
-        Question.user_id == current_user.id,
-        Question.id.in_(request.question_ids)
-    )
-    .all()
-)
+    questions = (db.query(Question).filter(Question.user_id == current_user.id, Question.id.in_(request.question_ids)).all())
     if not questions:
         raise HTTPException(
             status_code=404,
@@ -405,7 +293,6 @@ def export_pdf(request: ExportRequest, db: Session = Depends(get_db), current_us
         )
 
     pdf = generate_questions_pdf(questions, include_answers=request.include_answers, include_explanations=request.include_explanations)
-
     return StreamingResponse(
         pdf,
         media_type="application/pdf",
@@ -417,18 +304,9 @@ def export_pdf(request: ExportRequest, db: Session = Depends(get_db), current_us
 
 
 from app.services.docx_export_service import (generate_docx)
-
-
 @router.post("/export/docx")
 def export_docx(request: ExportRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    questions = (
-    db.query(Question)
-    .filter(
-        Question.user_id == current_user.id,
-        Question.id.in_(request.question_ids)
-    )
-    .all()
-)
+    questions = (db.query(Question).filter(Question.user_id == current_user.id, Question.id.in_(request.question_ids)).all())
     if not questions:
         raise HTTPException(
             status_code=404,
@@ -436,7 +314,6 @@ def export_docx(request: ExportRequest, db: Session = Depends(get_db), current_u
         )
 
     buffer = generate_docx(questions, include_answers=request.include_answers, include_explanations=request.include_explanations)
-
     return StreamingResponse(
         buffer,
         media_type=(
@@ -460,18 +337,14 @@ def export_all_pdf(
     current_user: User = Depends(get_current_user)
 ):
 
-    query = db.query(Question).filter(
-    Question.user_id == current_user.id)
+    query = db.query(Question).filter(Question.user_id == current_user.id)
 
     if topic:
         query = query.filter(Question.topic == topic)
-
     if difficulty:
         query = query.filter(Question.difficulty == difficulty)
-
     if status:
         query = query.filter(Question.status == status)
-
     questions = (query.order_by(Question.created_at.desc()).all())
 
     if not questions:
@@ -481,7 +354,6 @@ def export_all_pdf(
         )
 
     buffer = generate_questions_pdf(questions, include_answers=include_answers, include_explanations=include_explanations)
-
     return StreamingResponse(
         buffer,
         media_type="application/pdf",
@@ -503,18 +375,14 @@ def export_all_docx(
     current_user: User = Depends(get_current_user)
 ):
 
-    query = db.query(Question).filter(
-    Question.user_id == current_user.id)
+    query = db.query(Question).filter(Question.user_id == current_user.id)
 
     if topic:
         query = query.filter(Question.topic == topic)
-
     if difficulty:
         query = query.filter(Question.difficulty == difficulty)
-
     if status:
         query = query.filter(Question.status == status)
-
     questions = (query.order_by(Question.created_at.desc()).all())
 
     if not questions:
@@ -524,7 +392,6 @@ def export_all_docx(
         )
 
     buffer = generate_docx(questions, include_answers=include_answers, include_explanations=include_explanations)
-
     return StreamingResponse(
         buffer,
         media_type=(
@@ -538,7 +405,6 @@ def export_all_docx(
 
 
 from app.schemas.question import DeleteQuestionsRequest
-
 @router.delete("/")
 def delete_questions(
     request: DeleteQuestionsRequest,
@@ -546,13 +412,7 @@ def delete_questions(
     current_user: User = Depends(get_current_user)
 ):
     questions = (
-        db.query(Question)
-        .filter(
-            Question.user_id == current_user.id,
-            Question.id.in_(request.question_ids)
-        )
-        .all()
-    )
+        db.query(Question).filter( Question.user_id == current_user.id, Question.id.in_(request.question_ids)).all())
 
     if not questions:
         raise HTTPException(
@@ -564,7 +424,6 @@ def delete_questions(
 
     try:
         question_ids = [question.id for question in questions]
-
         db.query(GenerationLog).filter(
             GenerationLog.user_id == current_user.id,
             GenerationLog.question_id.in_(question_ids)
