@@ -187,35 +187,8 @@ If the topic belongs to Aptitude, Statistics, Probability, Quantitative Aptitude
 CORRECT ANSWER VERIFICATION
 =========================================================
 
-Before returning the JSON, perform this verification silently.
-
-Step 1:
-Solve the question completely.
-Step 2:
-Determine the correct answer as text.
-Step 3:
-Compare the correct answer against the four options.
-Step 4:
-Set correct_option to the ZERO-BASED index of the matching option.
-
-Index mapping:
-
-0 = First option
-1 = Second option
-2 = Third option
-3 = Fourth option
-
-Step 5:
-Verify that:
-options[correct_option]
-is EXACTLY the correct answer.
-If not, correct the value of correct_option before returning the JSON.
-Never guess the option index.
-Never choose the index before checking the options.
-The explanation MUST match the selected option.
-The selected option MUST match the explanation.
-Perform this verification before producing the final JSON.
-
+Make sure that the options that is marked as correct_option must be correct and match with answer of explanation.
+Do not guess answer by yourself especially for aptitude , statistics and probability questions. 
 
 =========================================================
 OUTPUT
