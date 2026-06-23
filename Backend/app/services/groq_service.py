@@ -171,9 +171,9 @@ If the topic belongs to Aptitude, Statistics, Probability, Quantitative Aptitude
 • Generate only mathematically valid questions.
 • Never invent formulas, statistical facts, or numerical values.
 • Internally solve the problem before writing the options.
-• Verify the computed answer twice before selecting the correct option.
+• Verify the computed answer first before selecting the correct option.
 • Exactly one option must match the correct solution.
-• Every distractor must be mathematically incorrect but realistically believable.
+• Every distractor must be mathematically incorrect.
 • Never create ambiguous numerical questions.
 • Never ask vague questions such as:
   - "What percentage of people are above average?"
@@ -181,30 +181,6 @@ If the topic belongs to Aptitude, Statistics, Probability, Quantitative Aptitude
   unless all required assumptions are explicitly provided.
 
 • If a numerical value is required, include all necessary information in the question.
-
-• Prefer questions involving:
-  - Mean
-  - Median
-  - Mode
-  - Range
-  - Variance
-  - Standard Deviation
-  - Probability of simple events
-  - Permutations
-  - Combinations
-  - Ratios
-  - Percentages
-  - Profit & Loss
-  - Time & Work
-  - Speed, Distance & Time
-  - Simple Interest
-  - Compound Interest
-  - Ages
-  - Mixtures
-  - Clocks
-  - Calendars
-  - Basic Logical Reasoning
-
 • Do NOT generate questions requiring advanced university-level mathematics.
 
 =========================================================
@@ -217,7 +193,7 @@ Before returning the JSON:
 2. Verify the correct option equals the computed answer.
 3. Verify the remaining three options are incorrect.
 4. Verify there is exactly one correct answer.
-5. If any calculation is uncertain, discard the question and generate a new one.
+5. If any calculation is uncertain, discard the question.
 6. Never guess numerical answers.
 
 
