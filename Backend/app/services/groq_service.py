@@ -184,17 +184,37 @@ If the topic belongs to Aptitude, Statistics, Probability, Quantitative Aptitude
 • Do NOT generate questions requiring advanced university-level mathematics.
 
 =========================================================
-SELF VERIFICATION
+CORRECT ANSWER VERIFICATION
 =========================================================
 
-Before returning the JSON:
+Before returning the JSON, perform this verification silently.
 
-1. Solve the question completely.
-2. Verify the correct option equals the computed answer.
-3. Verify the remaining three options are incorrect.
-4. Verify there is exactly one correct answer.
-5. If any calculation is uncertain, discard the question.
-6. Never guess numerical answers.
+Step 1:
+Solve the question completely.
+Step 2:
+Determine the correct answer as text.
+Step 3:
+Compare the correct answer against the four options.
+Step 4:
+Set correct_option to the ZERO-BASED index of the matching option.
+
+Index mapping:
+
+0 = First option
+1 = Second option
+2 = Third option
+3 = Fourth option
+
+Step 5:
+Verify that:
+options[correct_option]
+is EXACTLY the correct answer.
+If not, correct the value of correct_option before returning the JSON.
+Never guess the option index.
+Never choose the index before checking the options.
+The explanation MUST match the selected option.
+The selected option MUST match the explanation.
+Perform this verification before producing the final JSON.
 
 
 =========================================================
