@@ -76,18 +76,18 @@ Easy
 • One concept only
 • Direct question
 • No scenario
-• Maximum 24 words
+• Maximum 20 words
 
 Medium
 • Small scenario allowed
 • Tests understanding
-• Maximum 50 words
+• Maximum 35 words
 • Moderately complex questions allowed
 
 Hard
 • Small practical scenario
 • Requires reasoning
-• Maximum 80 words
+• Maximum 50 words
 • No enterprise-level knowledge
 • Slightly complex questions allowed
 
@@ -144,7 +144,7 @@ Never use:
 EXPLANATION
 =========================================================
 
-Write a short explanation (maximum three sentences), also focus more if it is numerical question.
+Write a short explanation (maximum three sentences), also perform mathematical operations if it is numerical question.
 Explain only why the correct answer is correct.
 
 =========================================================
