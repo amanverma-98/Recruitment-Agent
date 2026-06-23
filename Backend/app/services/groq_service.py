@@ -102,7 +102,7 @@ The question must:
 • Be technically correct.
 • Match the requested difficulty.
 • Be clear and concise.
-• Have exactly ONE correct answer.
+• Have exactly ONE correct answer which is matching with answer of explanation strictly.
 • Avoid ambiguity.
 • Avoid trick wording.
 • Be answerable without writing code.
@@ -189,7 +189,12 @@ CORRECT ANSWER VERIFICATION
 
 Make sure that the options that is marked as correct_option must be correct and match with answer of explanation.
 Do not guess answer by yourself especially for aptitude , statistics and probability questions. 
-Mark the option correct as given in explanation with 0 bazed index matching.
+Mark the option correct as given in explanation with 0 based-index matching.
+0 - Option A 
+1 - Option B
+2 - Option C
+3 - Option D
+Strictly make sure correct_answer matched with answer given in explanation
 
 =========================================================
 OUTPUT
