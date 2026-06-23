@@ -144,7 +144,8 @@ Never use:
 EXPLANATION
 =========================================================
 
-Write a short explanation (maximum three sentences), also perform mathematical operations if it is numerical question.
+Perform the mathematical calculations well not guessing or biasing towards LLM.
+Write a short quality explanation, and also perform mathematical operations if it is numerical question.
 Explain only why the correct answer is correct.
 
 =========================================================
