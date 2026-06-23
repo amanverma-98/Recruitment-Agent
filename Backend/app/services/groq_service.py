@@ -189,6 +189,7 @@ CORRECT ANSWER VERIFICATION
 
 Make sure that the options that is marked as correct_option must be correct and match with answer of explanation.
 Do not guess answer by yourself especially for aptitude , statistics and probability questions. 
+Mark the option correct as given in explanation with 0 bazed index matching.
 
 =========================================================
 OUTPUT
@@ -217,7 +218,7 @@ Return ONLY valid JSON.
                 "content": prompt
             }
         ],
-        temperature=0.4
+        temperature=0.6
     )
 
     content = (
