@@ -164,6 +164,9 @@ Return ONLY valid JSON.
         temperature=0.2
     )
 
+    
+    import re
+
     content = (
         response.choices[0]
         .message.content
@@ -171,5 +174,12 @@ Return ONLY valid JSON.
         .replace("```", "")
         .strip()
     )
+    # Extract only the first JSON object
+    match = re.search(r"\{.*\}", content, re.DOTALL)
+
+    if not match:
+        raise ValueError(f"No JSON found.\n\nResponse:\n{content}")
+
+    content = match.group(0)
 
     return json.loads(content)

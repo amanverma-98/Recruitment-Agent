@@ -17,9 +17,12 @@ improvements = [
     "Add practical context"
 ]
 
+reviewer_feedback = ["explain the options"]
+
 print(
     refine_question(
         question,
-        improvements
+        improvements,
+        reviewer_feedback
     )
 )
