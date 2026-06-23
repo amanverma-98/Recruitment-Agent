@@ -97,6 +97,7 @@ QUESTION RULES
 
 The question must:
 
+• Multiple choice question.
 • be unique
 • Test exactly ONE concept.
 • Be technically correct.
@@ -105,7 +106,6 @@ The question must:
 • Have exactly ONE correct answer which is matching with answer of explanation strictly.
 • Avoid ambiguity.
 • Avoid trick wording.
-• Be answerable without writing code.
 
 
 Never ask students to:
@@ -113,7 +113,7 @@ Never ask students to:
 • Write code
 • Write SQL
 • Construct queries
-• Complete code
+• Complete this code
 • Design algorithms
 • Create HTML or CSS
 
