@@ -7,6 +7,7 @@ from app.core.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes.auth import router as auth_router
 from app.api.routes import assessment
+from app.api.routes.public import router as public_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -44,3 +45,9 @@ app.include_router(
     prefix="/analytics",
     tags=["Analytics"]
 )
+
+app.include_router(
+    public_router,
+    prefix="/public",
+    tags=["Public"]
+)  # NEW

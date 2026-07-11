@@ -69,3 +69,16 @@ class CreateQuestionPayload(BaseModel):
 
 class DeleteQuestionsRequest(BaseModel):
     question_ids: list[str]    
+
+class QuestionPublicResponse(BaseModel):
+    id: str
+    topic: str
+    difficulty: str
+    question_type: str
+    question_text: str
+    options: List[str]
+    correct_option: int | None = None  # None when answers are hidden
+    status: str
+
+    class Config:
+        from_attributes = True
