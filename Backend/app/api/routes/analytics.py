@@ -45,7 +45,6 @@ def analytics(db: Session = Depends(get_db),current_user: User = Depends(get_cur
 
 
 from app.models.generation_log import GenerationLog
-
 @router.get("/logs")
 def get_logs(
     db: Session = Depends(get_db),

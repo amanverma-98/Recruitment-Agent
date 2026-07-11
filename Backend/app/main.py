@@ -6,6 +6,7 @@ from app.models.generation_log import GenerationLog
 from app.core.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes.auth import router as auth_router
+from app.api.routes import assessment
 
 Base.metadata.create_all(bind=engine)
 
@@ -29,6 +30,12 @@ app.include_router(
     question_router,
     prefix="/questions",
     tags=["Questions"]
+)
+
+app.include_router(
+    assessment.router,
+    prefix="/assessment",
+    tags=["Assessment"]
 )
 
 from app.api.routes.analytics import (router as analytics_router)
