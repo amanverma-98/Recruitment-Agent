@@ -172,6 +172,56 @@ def bulk_generate(request: BulkGenerateRequest, current_user: User = Depends(get
     }
 
 
+import json as json_module
+
+@router.post("/bulk-generate-stream")
+def bulk_generate_stream(request: BulkGenerateRequest, current_user: User = Depends(get_current_user)):
+    combinations = list(product(request.topics, request.difficulties))
+    random.shuffle(combinations)
+    tasks = []
+    for i in range(request.count):
+        tasks.append(combinations[i % len(combinations)])
+
+    total = len(tasks)
+
+    def event_stream():
+        generated_questions = []
+        failed = 0
+
+        for idx, (topic, difficulty) in enumerate(tasks):
+            try:
+                question_id = generate_single_question(topic, difficulty, current_user.id)
+                generated_questions.append(question_id)
+            except Exception as e:
+                print(e)
+                failed += 1
+
+            progress = {
+                "current": idx + 1,
+                "total": total,
+                "generated": len(generated_questions),
+                "failed": failed,
+                "percent": round(((idx + 1) / total) * 100),
+                "last_topic": topic,
+                "last_difficulty": difficulty,
+            }
+            yield f"data: {json_module.dumps(progress)}\n\n"
+
+        # Final complete event
+        final = {
+            "current": total,
+            "total": total,
+            "generated": len(generated_questions),
+            "failed": failed,
+            "percent": 100,
+            "question_ids": generated_questions,
+            "complete": True,
+        }
+        yield f"data: {json_module.dumps(final)}\n\n"
+
+    return StreamingResponse(event_stream(), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
 from app.models.question import Question
 @router.get("/", response_model=list[QuestionResponse])
 def get_questions(status: str | None = None, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):

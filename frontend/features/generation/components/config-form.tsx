@@ -21,7 +21,7 @@ const DIFFICULTIES = ["Easy", "Medium", "Hard"];
 
 export default function ConfigForm() {
   const store = useGenerationStore();
-  const { mutate, isPending } = useBulkGenerate();
+  const { mutate, isPending, progress } = useBulkGenerate();
   const { showToast } = useToast();
 
   const handleGenerate = () => {
@@ -171,7 +171,68 @@ export default function ConfigForm() {
 
      
       {/* Actions */}
-      <div className="pt-2">
+      <div className="pt-2 space-y-4">
+        {/* Progress Bar */}
+        {isPending && progress && (
+          <div className="space-y-3 bg-gradient-to-r from-purple-50 via-white to-purple-50 p-5 rounded-xl border border-purple-100 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            {/* Header with percentage */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="relative w-5 h-5">
+                  <div className="absolute inset-0 rounded-full border-2 border-purple-200" />
+                  <div className="absolute inset-0 rounded-full border-2 border-purple-600 border-t-transparent animate-spin" />
+                </div>
+                <span className="text-sm font-semibold text-gray-800">
+                  Generating Questions...
+                </span>
+              </div>
+              <span className="text-sm font-bold text-purple-700">
+                {progress.percent}%
+              </span>
+            </div>
+
+            {/* Progress track */}
+            <div className="relative h-3 bg-gray-100 rounded-full overflow-hidden">
+              <div
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${progress.percent}%` }}
+              />
+              <div
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-400/30 to-purple-500/30 rounded-full animate-pulse"
+                style={{ width: `${progress.percent}%` }}
+              />
+            </div>
+
+            {/* Stats row */}
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-gray-500 font-medium">
+                {progress.current} of {progress.total} completed
+              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-emerald-600 font-semibold">
+                  ✓ {progress.generated} success
+                </span>
+                {progress.failed > 0 && (
+                  <span className="text-rose-500 font-semibold">
+                    ✗ {progress.failed} failed
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Current processing info */}
+            {progress.last_topic && (
+              <div className="flex items-center gap-2 text-xs text-gray-400 pt-1 border-t border-purple-100/60">
+                <Loader2 className="w-3 h-3 animate-spin text-purple-400" />
+                <span>
+                  Processing <span className="font-semibold text-gray-600">{progress.last_topic}</span>
+                  {' '}· <span className="font-semibold text-gray-600">{progress.last_difficulty}</span>
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
         <button
           onClick={handleGenerate}
           disabled={
@@ -184,7 +245,7 @@ export default function ConfigForm() {
           {isPending ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span>Generating Core Sets...</span>
+              <span>Generating{progress ? ` (${progress.percent}%)` : ''}...</span>
             </>
           ) : (
             <>
