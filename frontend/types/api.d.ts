@@ -53,6 +53,10 @@ export interface ReviewRequest {
 export interface ExportPdfRequest {
   question_ids?: string[] | null;
   status?: string | null;
+  include_answers?: boolean;
+  include_explanations?: boolean;
+  include_topic?: boolean;
+  include_difficulty?: boolean;
 }
 
 /** `POST /questions/export/docx` request body */
@@ -62,10 +66,12 @@ export interface ExportDocxRequest {
 
 export interface ExportQuesWithoutDetailPdfRequest {
   status: string;
-  topic:string;
-  difficulty:string;
+  topic: string;
+  difficulty: string;
   include_answers: boolean;
   include_explanations: boolean;
+  include_topic: boolean;
+  include_difficulty: boolean;
 }
 
 

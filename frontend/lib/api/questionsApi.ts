@@ -102,3 +102,20 @@ export const exportQuesWithoutDetailDocx = async (payload:ExportQuesWithoutDetai
   });
   return response.data;
 }
+
+export const exportQuestionsJson = async (questionIds: string[], options?: { include_answers?: boolean; include_explanations?: boolean; include_topic?: boolean; include_difficulty?: boolean }): Promise<Blob> => {
+  const payload = { question_ids: questionIds, ...options };
+  const response = await apiClient.post('/questions/export/json', payload, {
+    responseType: 'blob',
+  });
+  return response.data;
+};
+
+export const exportQuesWithoutDetailJson = async (payload: ExportQuesWithoutDetailPdfRequest): Promise<Blob> => {
+  const response = await apiClient.get('/questions/export/json/all', {
+    params: payload,
+    responseType: 'blob'
+  });
+  return response.data;
+};
+

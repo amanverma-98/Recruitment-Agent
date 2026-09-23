@@ -1,8 +1,8 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { getApprovedQuestions, exportQuestionsPdf, exportQuestionsDocx } from '../services/bank-api';
+import { getApprovedQuestions, exportQuestionsPdf, exportQuestionsDocx, exportQuestionsJson } from '../services/bank-api';
 import type { ExportQuesWithoutDetailPdfRequest, QuestionResponse } from '@/types/api';
-import { exportQuesWithoutDetailDocx, exportQuesWithoutDetailPdf } from '@/lib/api/questionsApi';
+import { exportQuesWithoutDetailDocx, exportQuesWithoutDetailPdf, exportQuesWithoutDetailJson } from '@/lib/api/questionsApi';
 import { useToast } from '@/lib/hooks/use-toast';
 
 /**
@@ -139,6 +139,50 @@ export const useExportQuesWithoutDetailDocx = () => {
     },
     onError: () => {
       showToast('Failed to export DOCX. Please try again.', 'error');
+    }
+  });
+};
+
+export const useExportJson = () => {
+  const { showToast } = useToast();
+
+  return useMutation({
+    mutationFn: (args: { questionIds: string[]; options?: { include_answers?: boolean; include_explanations?: boolean; include_topic?: boolean; include_difficulty?: boolean } }) => exportQuestionsJson(args.questionIds, args.options),
+    onSuccess: (blobData) => {
+      const url = window.URL.createObjectURL(new Blob([blobData]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'exported-questions.json');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      showToast('JSON exported successfully.', 'success');
+    },
+    onError: () => {
+      showToast('Failed to export JSON. Please try again.', 'error');
+    }
+  });
+};
+
+export const useExportQuesWithoutDetailJson = () => {
+  const { showToast } = useToast();
+
+  return useMutation({
+    mutationFn: (payload: ExportQuesWithoutDetailPdfRequest) => exportQuesWithoutDetailJson(payload),
+    onSuccess: (blobData) => {
+      const url = window.URL.createObjectURL(new Blob([blobData]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'exported-questions.json');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      showToast('JSON exported successfully.', 'success');
+    },
+    onError: () => {
+      showToast('Failed to export JSON. Please try again.', 'error');
     }
   });
 };

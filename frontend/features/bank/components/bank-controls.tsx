@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FileDown, ChevronDown, Loader2, X, FileText, Trash2, AlertTriangle } from 'lucide-react';
-import { useExportPdf, useExportDocx, useExportQuesWithoutDetailPdf, useExportQuesWithoutDetailDocx } from '../hooks/use-bank';
+import { FileDown, ChevronDown, Loader2, X, FileText, Trash2, AlertTriangle, FileJson } from 'lucide-react';
+import { useExportPdf, useExportDocx, useExportJson, useExportQuesWithoutDetailPdf, useExportQuesWithoutDetailDocx, useExportQuesWithoutDetailJson } from '../hooks/use-bank';
 
 interface ControlsProps {
   selectedIds: string[];
@@ -23,36 +23,46 @@ export default function BankControls({ selectedIds, selectedCount, onSearchChang
   const { mutate: exportDocx, isPending: isDocxPending } = useExportDocx();
   const { mutate: exportWithParampdf, isPending: isWithParampdf } = useExportQuesWithoutDetailPdf();
   const { mutate: exportWithParamDocs, isPending: isWithParamdocs } = useExportQuesWithoutDetailDocx();
+  const { mutate: exportJson, isPending: isJsonPending } = useExportJson();
+  const { mutate: exportWithParamJson, isPending: isWithParamJson } = useExportQuesWithoutDetailJson();
   
-  const isPending = isPdfPending || isDocxPending;
-  const isParamPending = isWithParampdf || isWithParamdocs;
+  const isPending = isPdfPending || isDocxPending || isJsonPending;
+  const isParamPending = isWithParampdf || isWithParamdocs || isWithParamJson;
 
   const [payload, setPayload] = useState({
     status: "approved",
     difficulty: "",
     topic: "",
     include_answers: false,
-    include_explanations: false
+    include_explanations: false,
+    include_topic: true,
+    include_difficulty: true
   });
 
-  const handleWithParamExport = (format: 'pdf' | 'docx') => {
+  const handleWithParamExport = (format: 'pdf' | 'docx' | 'json') => {
     if (format === 'pdf') {
       exportWithParampdf({ ...payload }, {
         onSuccess: () => setShowParamMenu(false)
       });
-    } else {
+    } else if (format === 'docx') {
       exportWithParamDocs({ ...payload }, {
+        onSuccess: () => setShowParamMenu(false)
+      });
+    } else {
+      exportWithParamJson({ ...payload }, {
         onSuccess: () => setShowParamMenu(false)
       });
     }
   };
 
-  const handleExport = (format: 'pdf' | 'docx') => {
+  const handleExport = (format: 'pdf' | 'docx' | 'json') => {
     if (selectedIds.length === 0) return;
     if (format === 'pdf') {
       exportPdf(selectedIds);
-    } else {
+    } else if (format === 'docx') {
       exportDocx(selectedIds);
+    } else {
+      exportJson({ questionIds: selectedIds });
     }
     setShowExportMenu(false);
   };
@@ -60,10 +70,10 @@ export default function BankControls({ selectedIds, selectedCount, onSearchChang
   // ─── Bulk Actions Toolbar (shown when rows are selected) ───
   if (selectedCount > 0) {
     return (
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-gradient-to-r from-rose-50/80 via-white to-white p-4 rounded-xl border border-rose-200/60 shadow-sm transition-all duration-300 animate-in fade-in slide-in-from-top-2">
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-gradient-to-r from-purple-50/80 via-white to-rose-50/80 p-4 rounded-xl border border-purple-200/60 shadow-sm transition-all duration-300 animate-in fade-in slide-in-from-top-2">
         {/* Left: selection info */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-rose-100 text-rose-600">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-100 text-purple-600">
             <AlertTriangle className="w-4 h-4" />
           </div>
           <div>
@@ -75,7 +85,7 @@ export default function BankControls({ selectedIds, selectedCount, onSearchChang
         </div>
 
         {/* Right: action buttons */}
-        <div className="flex items-center gap-2 self-end sm:self-auto">
+        <div className="flex items-center gap-2 self-end sm:self-auto relative">
           {/* Cancel selection */}
           <button
             onClick={onCancelSelection}
@@ -85,13 +95,54 @@ export default function BankControls({ selectedIds, selectedCount, onSearchChang
             <span>Cancel</span>
           </button>
 
+          {/* Export Selected */}
+          <div className="relative">
+            <button
+              onClick={() => setShowExportMenu(!showExportMenu)}
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-sm shadow-purple-200 hover:shadow-purple-300"
+            >
+              {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}
+              <span>Export ({selectedCount})</span>
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
+
+            {showExportMenu && (
+              <div className="absolute right-0 mt-2 w-52 bg-white border border-gray-100 rounded-xl shadow-xl p-3 z-30 space-y-2 text-xs animate-in fade-in duration-100">
+                <span className="font-bold text-gray-400 block border-b border-gray-50 pb-1.5 uppercase tracking-wider text-[10px]">Export Format</span>
+                <div className="grid grid-cols-3 gap-2 pt-1">
+                  <button 
+                    onClick={() => handleExport('pdf')} 
+                    disabled={isPdfPending}
+                    className="py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-bold rounded-lg text-[11px] disabled:opacity-50"
+                  >
+                    {isPdfPending ? '...' : 'PDF'}
+                  </button>
+                  <button 
+                    onClick={() => handleExport('docx')} 
+                    disabled={isDocxPending}
+                    className="py-2.5 bg-purple-50 hover:bg-purple-100 border border-purple-100 text-purple-700 font-bold rounded-lg text-[11px] disabled:opacity-50"
+                  >
+                    {isDocxPending ? '...' : 'DOCX'}
+                  </button>
+                  <button 
+                    onClick={() => handleExport('json')} 
+                    disabled={isJsonPending}
+                    className="py-2.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 font-bold rounded-lg text-[11px] disabled:opacity-50"
+                  >
+                    {isJsonPending ? '...' : 'JSON'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Delete Selected */}
           <button
             onClick={onBulkDelete}
             className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-sm shadow-rose-200 hover:shadow-rose-300"
           >
             <Trash2 className="w-3.5 h-3.5" />
-            <span>Delete Selected ({selectedCount})</span>
+            <span>Delete ({selectedCount})</span>
           </button>
         </div>
       </div>
@@ -234,7 +285,7 @@ export default function BankControls({ selectedIds, selectedCount, onSearchChang
                   </select>
                 </div>
 
-                {/* Field 4 & 5: Checkboxes for Answers & Explanations */}
+                {/* Field 4, 5, 6, 7: Checkboxes for Answers, Explanations, Topic & Difficulty */}
                 <div className="grid grid-cols-2 gap-4 pt-1 bg-gray-50 p-3 rounded-xl border border-gray-100">
                   <label className="flex items-center gap-2 cursor-pointer select-none">
                     <input 
@@ -255,11 +306,31 @@ export default function BankControls({ selectedIds, selectedCount, onSearchChang
                     />
                     <span className="font-semibold text-gray-600">Explanations</span>
                   </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input 
+                      type="checkbox"
+                      checked={payload.include_topic}
+                      onChange={(e) => setPayload({ ...payload, include_topic: e.target.checked })}
+                      className="w-4 h-4 rounded text-purple-600 border-gray-300 focus:ring-purple-500"
+                    />
+                    <span className="font-semibold text-gray-600">Include Topic</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input 
+                      type="checkbox"
+                      checked={payload.include_difficulty}
+                      onChange={(e) => setPayload({ ...payload, include_difficulty: e.target.checked })}
+                      className="w-4 h-4 rounded text-purple-600 border-gray-300 focus:ring-purple-500"
+                    />
+                    <span className="font-semibold text-gray-600">Include Difficulty</span>
+                  </label>
                 </div>
               </div>
 
-              {/* Action Buttons Footer (PDF and DOCX Buttons) */}
-              <div className="grid grid-cols-2 gap-3 border-t border-gray-100 pt-4 mt-5">
+              {/* Action Buttons Footer (PDF, DOCX, and JSON Buttons) */}
+              <div className="grid grid-cols-3 gap-3 border-t border-gray-100 pt-4 mt-5">
                 <button
                   type="button"
                   disabled={isParamPending}
@@ -279,6 +350,16 @@ export default function BankControls({ selectedIds, selectedCount, onSearchChang
                   {isWithParamdocs ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
                   <span>Export DOCX</span>
                 </button>
+
+                <button
+                  type="button"
+                  disabled={isParamPending}
+                  onClick={() => handleWithParamExport('json')}
+                  className="py-2.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 font-bold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                >
+                  {isWithParamJson ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                  <span>Export JSON</span>
+                </button>
               </div>
             </div>
           </div>
@@ -286,9 +367,9 @@ export default function BankControls({ selectedIds, selectedCount, onSearchChang
 
         {/* 2. Standard Selected Export Dropdown */}
         {showExportMenu && (
-          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl p-3 z-30 space-y-2 text-xs animate-in fade-in duration-100">
+          <div className="absolute right-0 mt-2 w-52 bg-white border border-gray-100 rounded-xl shadow-xl p-3 z-30 space-y-2 text-xs animate-in fade-in duration-100">
             <span className="font-bold text-gray-400 block border-b border-gray-50 pb-1.5 uppercase tracking-wider text-[10px]">Export Format</span>
-            <div className="grid grid-cols-2 gap-2 pt-1">
+            <div className="grid grid-cols-3 gap-2 pt-1">
               <button 
                 onClick={() => handleExport('pdf')} 
                 disabled={isPdfPending}
@@ -302,6 +383,13 @@ export default function BankControls({ selectedIds, selectedCount, onSearchChang
                 className="py-2.5 bg-purple-50 hover:bg-purple-100 border border-purple-100 text-purple-700 font-bold rounded-lg text-[11px] disabled:opacity-50"
               >
                 {isDocxPending ? '...' : 'DOCX'}
+              </button>
+              <button 
+                onClick={() => handleExport('json')} 
+                disabled={isJsonPending}
+                className="py-2.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 font-bold rounded-lg text-[11px] disabled:opacity-50"
+              >
+                {isJsonPending ? '...' : 'JSON'}
               </button>
             </div>
           </div>

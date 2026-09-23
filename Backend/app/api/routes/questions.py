@@ -400,6 +400,67 @@ def export_all_docx(
     )
 
 
+from app.services.json_export_service import generate_questions_json
+@router.post("/export/json")
+def export_json(request: ExportRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    questions = (db.query(Question).filter(Question.user_id == current_user.id, Question.id.in_(request.question_ids)).all())
+    if not questions:
+        raise HTTPException(
+            status_code=404,
+            detail="No questions found"
+        )
+
+    buffer = generate_questions_json(questions, include_answers=request.include_answers, include_explanations=request.include_explanations, include_topic=request.include_topic, include_difficulty=request.include_difficulty)
+    return StreamingResponse(
+        buffer,
+        media_type="application/json",
+        headers={
+            "Content-Disposition":
+            "attachment; filename=questions.json"
+        }
+    )
+
+
+@router.get("/export/json/all")
+def export_all_json(
+    topic: str | None = None,
+    difficulty: str | None = None,
+    status: str = "approved",
+    include_answers: bool = True,
+    include_explanations: bool = False,
+    include_topic: bool = True,
+    include_difficulty: bool = True,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+
+    query = db.query(Question).filter(Question.user_id == current_user.id)
+
+    if topic:
+        query = query.filter(Question.topic == topic)
+    if difficulty:
+        query = query.filter(Question.difficulty == difficulty)
+    if status:
+        query = query.filter(Question.status == status)
+    questions = (query.order_by(Question.created_at.desc()).all())
+
+    if not questions:
+        raise HTTPException(
+            status_code=404,
+            detail="No questions found"
+        )
+
+    buffer = generate_questions_json(questions, include_answers=include_answers, include_explanations=include_explanations, include_topic=include_topic, include_difficulty=include_difficulty)
+    return StreamingResponse(
+        buffer,
+        media_type="application/json",
+        headers={
+            "Content-Disposition":
+            "attachment; filename=question_bank.json"
+        }
+    )
+
+
 from app.schemas.question import DeleteQuestionsRequest
 @router.delete("/")
 def delete_questions(

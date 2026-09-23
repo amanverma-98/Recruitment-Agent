@@ -2,6 +2,7 @@ import {
   getQuestions,
   exportQuestionsPdf,
   exportQuestionsDocx,
+  exportQuestionsJson,
 } from '@/lib/api/questionsApi';
 import type { QuestionResponse } from '@/types/api';
 
@@ -16,6 +17,6 @@ export const getApprovedQuestions = async (): Promise<Question[]> => {
 };
 
 /**
- * Export selected questions as PDF.
+ * Export selected questions as PDF/DOCX/JSON.
  */
-export { exportQuestionsPdf, exportQuestionsDocx };
+export { exportQuestionsPdf, exportQuestionsDocx, exportQuestionsJson };
